@@ -8,11 +8,7 @@ class Genepop():
 	'Class for parsing and writing Genepop format files'
 
 	def __init__(self, f):
-	#def __init__(self, df, popmap):
-		#self.pdf = df
-		#self.pops = popmap
-		#self.nucleotides = {'A': '01', 'C': '02', 'G': '03', 'T': '04', '-': '05', '0': '00'}
-		self.file = f
+		self.file = f # input genepop file
 
 	def parse(self):
 		# read file

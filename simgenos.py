@@ -7,6 +7,25 @@ class SimGenos():
 
 	def __init__(self, d):
 		self.d = d
+		self.miss = self.determineMissing()
+
+	def determineMissing(self):
+		missDict = dict() # dictionary to hold missing data proportions
+		for (locus, key2) in self.d.items():
+			remove = list() # list of dictionary keys to remove
+			total = 0 # keep track of total allele count for calculating missing data proportion
+			missing = 0 # keep track of number of missing alleles
+			for (key, val) in key2.items():
+				total = int(val) + total
+				length = len(str(key)) # get length to construct missing data value
+				miss = "0" * length # construct missing data value
+				if str(key) == miss:
+					remove.append(key) # add missing data value to list of secondary keys to be deleted from self.d
+					missing = missing + int(val) # add to running total of missing alleles
+			missDict[locus] = (missing/float(total)) # calculate missing data proportion for locus
+			for item in remove:
+				del self.d[locus][item] # remove missing data keys from self.d
+		return missDict
 
 	def simInds(self, inds):
 		indlist = list(range(inds))
@@ -39,22 +58,21 @@ class SimGenos():
 		for (ind, d ) in data.items(): # for each individual
 			df_dict = pandas.DataFrame([d]) # convert individual's genotype from dict to pandas dataframe
 			df = pandas.concat([df, df_dict], ignore_index=True) # add to growing dataframe
-		#print(df)
 
 		return df
 
-	'''
-		n=1 #number of trials
-		p=0.05 #probability of each trial
-		s = numpy.random.binomial(n, p)
+	def simMissing(self, df):
+		# determine which loci need to have missing data simulated
+		simList = list() # list of loci needing missing data simulation
+		for (key, val) in self.miss.items():
+			if val > 0.0:
+				simList.append(key) # add to list of missing data proportion > 0.0
 
-		#print(str(s))
+		for locus in simList:
+			for index, row in df.loc[:, [locus]].iterrows():
+				s = numpy.random.binomial(1, self.miss[locus])
+				if(s == 1):
+					genoLen = len(str(row[locus])) # get length of encoded genotype
+					newgeno = "0" * genoLen # make missing data genotype
+					df.loc[index,locus] = newgeno # insert missing data genotype
 
-		# multinomial with multiple alleles
-		#m = numpy.random.multinomial(2, [46.0/100, 44.0/100, 10.0/100]) # 3 alleles
-		m = numpy.random.multinomial(2, numpy.divide([34, 41, 10, 13, 2], float(100))) # 5 alleles
-		#m = numpy.random.multinomial(2, numpy.divide([50, 50], float(100))) # 2 alleles
-		print(m)
-		# ex. output = [ 0 2 0 ]
-		# this means it landed 0 times on 1, 2 times on 2, and 0 times on 3. 
-	'''

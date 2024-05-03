@@ -14,6 +14,11 @@ class ComLine():
 							required=True,
 							help="Specify a file in genepop format for input."
 		)
+		optional.add_argument("-m", "--miss",
+							dest='miss',
+							action='store_true',
+							help="Turn on missing data simulation."
+		)
 		optional.add_argument("-n", "--inds",
 							dest='inds',
 							type=int,

@@ -21,6 +21,10 @@ def main():
 	sg = SimGenos(freqs) # make new SimGenos object
 	simPdf = sg.simInds(input.args.inds) # simulate genotypes for the requested number of individuals
 
+	# optional missing data simulation
+	if input.args.miss == True:
+		sg.simMissing(simPdf)
+
 	#print(simPdf)
 
 	gp.write(simPdf, input.args.outfile) # write simulated genotypes to genepop file
