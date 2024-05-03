@@ -61,7 +61,7 @@ Required Inputs:
 
 Optional Inputs:
 * **-m / --miss:** Boolean. Turn on missing data simulation (default = off).
-* **-n / --inds:** Specify the number of individuals for which you want to generate simulated genotypes.
+* **-n / --inds:** Specify the number of individuals for which you want to generate simulated genotypes (default = 50).
 * **-o / --outfile:** Specify an output file name (default = output.genepop.txt)
 
 ## Example Commands
