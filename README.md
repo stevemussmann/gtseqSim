@@ -3,7 +3,11 @@ Simulate genotype data based on allele frequencies.
 
 This program is a work in progress. This README.md file will be updated regarding program functionality as features are added.
 
-This program calculates allele frequencies for a single population based upon the observed frequencies in the input genepop file. The `random.multinomial` function from numpy is then used to generate simulated genotypes for a user-defined number of individuals based upon those empirical allele frequencies. Loci are assumed to be independent. The simulated genotypes are then output in genepop format.
+This program calculates allele frequencies for a single population based upon the observed frequencies in the input genepop file. The `random.multinomial` function from numpy is then used to generate simulated genotypes for a user-defined number of individuals based upon those empirical allele frequencies. 
+
+The missing genotype rate is calculated separately for each locus from your input genepop file. If the `-m / --miss` option is invoked, then the program will each locus in which missing data were detected and randomly remove genotypes from these loci using the empirically-derived missing data proportion. This is accomplished using the `random.binomial` function from numpy. 
+
+Loci are assumed to be independent. The simulated genotypes are then output in genepop format.
 
 ## Dependencies
 - numpy
@@ -44,9 +48,9 @@ export PATH=/path/to/gtseqSim:$PATH
 - This program is in a very early development stage - use at your own risk.
 - Currently treats all individuals in the input genepop file as belonging to the same population.
 - Genepop input format should be somewhat flexible (i.e., either 2-digit or 3-digit format should be acceptable but not tested).
-- Does not currently handle missing data properly. Missing data might cause the program to crash or produce weird/unexpected output unless missing alleles also coded in 2-digit or 3-digit format (i.e., 0000 for 2-digit or 000000 for 3-digit).
-- Genotyping error and missing data simulation functions not yet implemented.
-- Minimal error checking procedures have been implemented. Error messages will be minimally helpful to the user.
+- Missing alleles must be coded in genepop 2-digit or 3-digit format (i.e., 0000 for 2-digit or 000000 for 3-digit).
+- Genotyping error simulation function not yet implemented.
+- Minimal error checking procedures have been implemented. Most error messages will be minimally helpful to the user.
 
 ## Input Requirements
 ### Required
@@ -56,13 +60,14 @@ Required Inputs:
 * **-g / --genepop:** Specify an input text file in genepop format.
 
 Optional Inputs:
+* **-m / --miss:** Boolean. Turn on missing data simulation (default = off).
 * **-n / --inds:** Specify the number of individuals for which you want to generate simulated genotypes.
 * **-o / --outfile:** Specify an output file name (default = output.genepop.txt)
 
 ## Example Commands
-To generate 500 simulated genotypes from the example data, use the following command:
+To generate 500 simulated genotypes from the example data and simulate missing data, use the following command:
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -o msatExample.genepop.txt
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -o msatExample.genepop.txt -m
 ```
 This will create the output `msatExample.genepop.txt` in the folder from which the command was executed.
 
