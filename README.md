@@ -59,5 +59,12 @@ Optional Inputs:
 * **-n / --inds:** Specify the number of individuals for which you want to generate simulated genotypes.
 * **-o / --outfile:** Specify an output file name (default = output.genepop.txt)
 
+## Example Commands
+To generate 500 simulated genotypes from the example data, use the following command:
+```
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -o msatExample.genepop.txt
+```
+This will create the output `msatExample.genepop.txt` in the folder from which the command was executed.
+
 ## Outputs
 Output will be a genepop file of simulated genotypes.
