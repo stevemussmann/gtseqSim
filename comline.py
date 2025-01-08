@@ -14,6 +14,10 @@ class ComLine():
 							required=True,
 							help="Specify a file in genepop format for input."
 		)
+		required.add_argument("-G", "--genepop2",
+							dest='genepop2',
+							help="Specify a second genepop file containing allele frequencies for a second population [optional]."
+		)
 		optional.add_argument("-m", "--miss",
 							dest='miss',
 							action='store_true',
@@ -44,6 +48,16 @@ class ComLine():
 
 		#check if files exist
 		self.exists( self.args.genepop )
+		if self.args.genepop2:
+			self.exists( self.args.genepop2 )
+
+		# check if genepop and genepop2 are same file and print warning
+		if self.args.genepop2:
+			if self.args.genepop == self.args.genepop2:
+				print("****************************************************************************************************")
+				print("WARNING: both genepop files have the same name. If this was not intentional please check your input.")
+				print("****************************************************************************************************")
+				print("")
 
 	def exists(self, filename):
 		if( os.path.isfile(filename) != True ):
