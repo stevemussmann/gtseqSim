@@ -66,6 +66,7 @@ def main():
 		repro = Reproduce(simPdf, simPdf2)
 	else:
 		repro = Reproduce(simPdf)
+		repro.repro()
 
 	# optional missing data simulation
 	if input.args.miss == True:
