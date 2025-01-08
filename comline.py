@@ -14,7 +14,7 @@ class ComLine():
 							required=True,
 							help="Specify a file in genepop format for input."
 		)
-		required.add_argument("-G", "--genepop2",
+		optional.add_argument("-G", "--genepop2",
 							dest='genepop2',
 							help="Specify a second genepop file containing allele frequencies for a second population [optional]."
 		)
@@ -28,6 +28,12 @@ class ComLine():
 							type=int,
 							default=50,
 							help="Specify the number of individual genotypes to simulate"
+		)
+		optional.add_argument("-p", "--progeny",
+							dest='progeny',
+							type=int,
+							default=50,
+							help="Specify the number of progeny per parental pair"
 		)
 		optional.add_argument("-o", "--outfile",
 							dest='outfile',

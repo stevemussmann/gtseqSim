@@ -66,7 +66,7 @@ def main():
 		repro = Reproduce(simPdf, simPdf2)
 	else:
 		repro = Reproduce(simPdf)
-		repro.repro()
+		repro.repro(input.args.progeny)
 
 	# optional missing data simulation
 	if input.args.miss == True:

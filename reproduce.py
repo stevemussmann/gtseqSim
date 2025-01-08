@@ -3,6 +3,7 @@ import numpy
 import pandas
 import random
 import re
+import time
 
 class Reproduce():
 	'Class for simulating reproduction within or among 1-2 sample groups'
@@ -11,7 +12,7 @@ class Reproduce():
 		self.geno1 = simPdf
 		self.geno2 = simPdf2
 
-	def repro(self):
+	def repro(self, nOff):
 		#print(self.geno1)
 		if self.geno2 is not None:
 			print("geno2 found")
@@ -19,14 +20,19 @@ class Reproduce():
 		else:
 			print("only geno1 found")
 			spawnPairs = self.getSpawnPairs()
-			self.spawn(spawnPairs, 10, "F1") # 10 is a placeholder for number offspring per spawn pair
+			df = self.spawn(spawnPairs, nOff, "F1") # 10 is a placeholder for number offspring per spawn pair
+			print(df)
 
 	def spawn(self, dPairs, nOff, prefix):
+		#df = pandas.DataFrame() # empty dataframe to hold offspring
+		dictlist = list()
 		female=0
 		male=0
 		#for each spawning pair
 		for key, pair in dPairs.items():
 			#for each offspring per pair
+			print("Simulating", str(nOff), "progeny for sample pair", str(pair))
+			#start_time = time.time()
 			for n in range(nOff):
 				mHap = self.getHaplotype(pair[0], self.geno1) # sample male parent haplotype
 				fHap = self.getHaplotype(pair[1], self.geno1) # sample female parent haplotype
@@ -39,7 +45,23 @@ class Reproduce():
 				elif b == 1:
 					name = prefix + "_M" + str(male)
 					male = male+1
-				print(name)
+				#print(name)
+
+				##This was really slow
+				#df_dict = pandas.DataFrame([offspring], index=[name])
+				#df = pandas.concat([df, df_dict])
+				
+				##Faster method - make list of dicts and do single conversion to pandas dataframe at end
+				offspring["index"]=name
+				dictlist.append(offspring)
+			
+			#end_time = time.time()
+			#elapsed = end_time - start_time
+			#print("Time =", elapsed, "seconds")
+
+		df = pandas.DataFrame(dictlist) #single conversion to pandas dataframe
+		df.set_index('index', inplace=True) #set index of pandas dataframe
+		return df
 
 
 	def combDict(self, mHap, fHap):
