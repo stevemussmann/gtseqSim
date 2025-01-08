@@ -36,11 +36,6 @@ def main():
 	# simulate genotypes for first (or only) genepop file
 	sg = SimGenos(freqs) # make new SimGenos object
 	simPdf = sg.simInds(input.args.inds) # simulate genotypes for the requested number of individuals
-	
-	# optional missing data simulation
-	if input.args.miss == True:
-		sg.simMissing(simPdf)
-	#print(simPdf)
 
 
 	## handle second (optional) genepop file
@@ -48,6 +43,13 @@ def main():
 		# parse second (optional) genepop file
 		gp2 = Genepop(input.args.genepop2) # make new Genepop object
 		pdf2 = gp2.parse() # parse genepop file and return pandas dataframe
+
+		# check if pdf2 contains same loci as pdf
+		if not pdf.columns.equals(pdf2.columns):
+			print("ERROR:", str(input.args.genepop2), "contains at least one locus not found in", str(input.args.genepop))
+			print("Check your inputs to ensure both files contain the same set of loci.")
+			print("")
+			raise SystemExit
 	
 		# calculate allele frequencies
 		af2 = Allelefreqs(pdf2) # make new allelefreqs object
@@ -56,10 +58,6 @@ def main():
 		# simulate genotypes 
 		sg2 = SimGenos(freqs2) # make new SimGenos object
 		simPdf2 = sg2.simInds(input.args.inds) # simulate requested number of genotypes
-		# optional missing data simulation
-		if input.args.miss == True:
-			sg2.simMissing(simPdf2)
-		#print(simPdf2)
 
 
 	## simulate reproduction
@@ -68,6 +66,17 @@ def main():
 		repro = Reproduce(simPdf, simPdf2)
 	else:
 		repro = Reproduce(simPdf)
+
+	# optional missing data simulation
+	if input.args.miss == True:
+		sg.simMissing(simPdf)
+	#print(simPdf)
+		
+	if input.args.genepop2:
+		# optional missing data simulation
+		if input.args.miss == True:
+			sg2.simMissing(simPdf2)
+		#print(simPdf2)
 
 	# write outputs
 	gp.write(simPdf, input.args.outfile) # write simulated genotypes to genepop file

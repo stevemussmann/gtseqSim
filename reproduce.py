@@ -1,5 +1,5 @@
-import collections
-import numpy
+#import collections
+#import numpy
 import pandas
 
 class Reproduce():
@@ -9,8 +9,8 @@ class Reproduce():
 		self.geno1 = simPdf
 		self.geno2 = simPdf2
 
-		print(self.geno1)
+		#print(self.geno1)
 		if self.geno2 is not None:
 			print("geno2 found")
-			print(self.geno2)
+			#print(self.geno2)
 

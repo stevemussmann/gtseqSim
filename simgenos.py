@@ -27,9 +27,26 @@ class SimGenos():
 				del self.d[locus][item] # remove missing data keys from self.d
 		return missDict
 
+	def makeSampleNames(self, inds, prefix):
+		pad = len(str(inds)) # get number padding length
+		female=0
+		male=0
+		indList = list()
+		for i in range(inds):
+			b = numpy.random.binomial(1, 0.5) # binomial to assign sex. 0 = f; 1 = m
+			if b == 0:
+				name = prefix + "_F" + str(female).zfill(pad)
+				female = female+1
+				indList.append(name)
+			elif b == 1:
+				name = prefix + "_M" + str(male).zfill(pad)
+				male = male+1
+				indList.append(name)
+
+		return indList
+
 	def simInds(self, inds):
-		indlist = list(range(inds))
-		#print(indlist)
+		indlist = self.makeSampleNames(inds, "prefix")
 		data = collections.defaultdict(dict) # key1 = individual; key2 = locus, val = alleles
 
 		# locus = locus name
@@ -56,8 +73,8 @@ class SimGenos():
 
 		df = pandas.DataFrame() # make empty dataframe
 		for (ind, d ) in data.items(): # for each individual
-			df_dict = pandas.DataFrame([d]) # convert individual's genotype from dict to pandas dataframe
-			df = pandas.concat([df, df_dict], ignore_index=True) # add to growing dataframe
+			df_dict = pandas.DataFrame([d], index=[ind]) # convert individual's genotype from dict to pandas dataframe
+			df = pandas.concat([df, df_dict]) # add to growing dataframe
 
 		return df
 
