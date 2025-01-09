@@ -1,9 +1,10 @@
 from collections import defaultdict
+
 import numpy
 import pandas
 import random
 import re
-import time
+#import time
 
 class Reproduce():
 	'Class for simulating reproduction within or among 1-2 sample groups'
@@ -12,30 +13,80 @@ class Reproduce():
 		self.geno1 = simPdf
 		self.geno2 = simPdf2
 
-	def repro(self, nOff):
+	def repro(self, nOff, prefix):
 		#print(self.geno1)
 		if self.geno2 is not None:
 			print("geno2 found")
 			#print(self.geno2)
 		else:
-			print("only geno1 found")
-			spawnPairs = self.getSpawnPairs()
-			df = self.spawn(spawnPairs, nOff, "F1") # 10 is a placeholder for number offspring per spawn pair
-			print(df)
+			print("Conducting within-population crosses...\n")
+			gen = int(prefix[1:])
+			if gen > 1:
+				prevgen = "F" + str(gen-1)
+				parentage = prevgen + ".parentage.txt"
+				# after F1, downsample to retain 1 male and 1 female per family group
+				genoMatrix, sibDict = self.subsample(self.geno1, parentage)
+			else:
+				# if F1, send full simulated genotype matrix
+				genoMatrix = self.geno1
 
-	def spawn(self, dPairs, nOff, prefix):
-		#df = pandas.DataFrame() # empty dataframe to hold offspring
+			if gen > 1:	
+				spawnPairs = self.getSpawnPairs(genoMatrix, sibDict)
+			else:
+				spawnPairs = self.getSpawnPairs(genoMatrix)
+				
+			df = self.spawn(spawnPairs, nOff, prefix, genoMatrix)
+			return df
+			#print(df)
+
+	def subsample(self, genoMatrix, parentage):
+		with open(parentage, 'r') as f:
+			lines = f.readlines()
+
+		# get dict of families
+		famDict = defaultdict(list)
+		lines = lines[1:] # remove header line from lines
+		for line in lines:
+			temp = line.split()
+			key = ",".join([temp[0], temp[1]])
+			famDict[key].append(temp[2])
+
+		#print(famDict)
+
+		# pick one male and one female from each family
+		keepList = list()
+		sibDict = dict()
+		for fam, sibs in famDict.items():
+			mList, fList = self.checkMF(sibs) # get lists of male and female individuals
+
+			mRand = random.sample(mList, 1)
+			fRand = random.sample(fList, 1)
+			
+			keepList.append(mRand[0])
+			keepList.append(fRand[0])
+
+			sibDict[mRand[0]] = fRand[0]
+
+		genoMatrix = genoMatrix.loc[keepList]
+
+		return genoMatrix, sibDict
+
+	def spawn(self, dPairs, nOff, prefix, genoMatrix):
+		parentageFile = prefix + ".parentage.txt"
+		fh = open(parentageFile, 'w')
+		fh.write("male_parent\tfemale_parent\toffspring\n")
+
 		dictlist = list()
 		female=0
 		male=0
+
 		#for each spawning pair
 		for key, pair in dPairs.items():
 			#for each offspring per pair
 			print("Simulating", str(nOff), "progeny for sample pair", str(pair))
-			#start_time = time.time()
 			for n in range(nOff):
-				mHap = self.getHaplotype(pair[0], self.geno1) # sample male parent haplotype
-				fHap = self.getHaplotype(pair[1], self.geno1) # sample female parent haplotype
+				mHap = self.getHaplotype(pair[0], genoMatrix) # sample male parent haplotype
+				fHap = self.getHaplotype(pair[1], genoMatrix) # sample female parent haplotype
 			
 				offspring = self.combDict(mHap, fHap) # combine haplotypes
 				b = numpy.random.binomial(1, 0.5) # binomial to decide sex. 0 = f; 1 = m
@@ -45,22 +96,19 @@ class Reproduce():
 				elif b == 1:
 					name = prefix + "_M" + str(male)
 					male = male+1
-				#print(name)
-
-				##This was really slow
-				#df_dict = pandas.DataFrame([offspring], index=[name])
-				#df = pandas.concat([df, df_dict])
 				
-				##Faster method - make list of dicts and do single conversion to pandas dataframe at end
+				# write parentage information to file
+				parentLine = pair[0] + "\t" + pair[1] + "\t" + name + "\n"
+				fh.write(parentLine)
+
 				offspring["index"]=name
 				dictlist.append(offspring)
 			
-			#end_time = time.time()
-			#elapsed = end_time - start_time
-			#print("Time =", elapsed, "seconds")
-
 		df = pandas.DataFrame(dictlist) #single conversion to pandas dataframe
 		df.set_index('index', inplace=True) #set index of pandas dataframe
+
+		fh.close()
+
 		return df
 
 
@@ -104,8 +152,8 @@ class Reproduce():
 		elif b == 1:
 			return a1
 
-	def getSpawnPairs(self):
-		index_list = self.geno1.index.to_list()
+	def getSpawnPairs(self, genoMatrix, sibDict=None):
+		index_list = genoMatrix.index.to_list()
 
 		mList, fList = self.checkMF(index_list) # get lists of male and female individuals
 		
@@ -117,6 +165,10 @@ class Reproduce():
 
 		dPairs = defaultdict(list)
 		for i in range(nPairs):
+			# FIGURE OUT HOW TO DEAL WITH FULL SIBLING PAIRS
+			if sibDict:
+				if sibDict[mRand[i]] == fRand[i]:
+					print("Full Sib Pair")
 			dPairs[i].append(mRand[i])
 			dPairs[i].append(fRand[i])
 

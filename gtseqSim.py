@@ -65,8 +65,11 @@ def main():
 	if input.args.genepop2:
 		repro = Reproduce(simPdf, simPdf2)
 	else:
-		repro = Reproduce(simPdf)
-		repro.repro(input.args.progeny)
+		reproDF = simPdf
+		for i in range(3):
+			repro = Reproduce(reproDF)
+			prefix = "F" + str(i+1)
+			reproDF = repro.repro(input.args.progeny, prefix)
 
 	# optional missing data simulation
 	if input.args.miss == True:
