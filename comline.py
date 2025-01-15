@@ -46,6 +46,11 @@ class ComLine():
 							default=50,
 							help="Specify the number of progeny per parental pair"
 		)
+		optional.add_argument("-s", "--sequoia",
+							dest='sequoia',
+							action='store_true',
+							help="Write sequoia output (works for biallelic loci only)."
+		)
 		optional.add_argument("-t", "--prefix1",
 							dest='prefix1',
 							default="taxon1",

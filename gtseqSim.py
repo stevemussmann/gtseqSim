@@ -4,6 +4,7 @@ from allelefreqs import Allelefreqs
 from comline import ComLine
 from genepop import Genepop
 from reproduce import Reproduce
+from sequoia import Sequoia
 from simgenos import SimGenos
 
 import datetime
@@ -98,6 +99,22 @@ def main():
 		prefix = "F" + str(i+1)
 		fn = prefix + ".genepop.txt"
 		gp.write(dfList[i], fn)
+	
+	# write sequoia output (only works for datasets with exclusively biallelic loci)
+	if input.args.sequoia:
+		frames = list()
+		frames.append(simPdf)
+		for frame in dfList:
+			frames.append(frame)
+		combo = pandas.concat(frames)
+		print("Writing sequoia output file...")
+		seq = Sequoia(combo, sg.mval) # sg.mval is missing data value returned from SimGenos object
+		output = seq.convert()
+
+		seqfh = open("output.sequoia.txt", 'w')
+		for line in output:
+			seqfh.write(line)
+			seqfh.write("\n")
 
 
 	# close log file for writing

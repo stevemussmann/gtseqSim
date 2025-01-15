@@ -7,9 +7,10 @@ class SimGenos():
 
 	def __init__(self, d):
 		self.d = d
-		self.miss = self.determineMissing()
+		self.miss, self.mval = self.determineMissing()
 
 	def determineMissing(self):
+		miss = ""
 		missDict = dict() # dictionary to hold missing data proportions
 		for (locus, key2) in self.d.items():
 			remove = list() # list of dictionary keys to remove
@@ -25,7 +26,7 @@ class SimGenos():
 			missDict[locus] = (missing/float(total)) # calculate missing data proportion for locus
 			for item in remove:
 				del self.d[locus][item] # remove missing data keys from self.d
-		return missDict
+		return missDict, miss
 
 	def makeSampleNames(self, inds, prefix, pad):
 		#pad = len(str(inds)) # get number padding length
