@@ -105,7 +105,15 @@ class Reproduce():
 				dictlist.append(offspring)
 			
 		df = pandas.DataFrame(dictlist) #single conversion to pandas dataframe
-		df.set_index('index', inplace=True) #set index of pandas dataframe
+		
+		try:
+			df.set_index('index', inplace=True) #set index of pandas dataframe
+		except KeyError as e:
+			print("ERROR:", e)
+			print("Try increasing the number of simulated individuals in the first generation (-n / --inds)")
+			print("Exiting program...")
+			print("")
+			raise SystemExit
 
 		fh.close()
 
@@ -168,23 +176,31 @@ class Reproduce():
 		## check for full-sibling spawn pairs and correct to prevent inbreeding
 		# Only one male and female is sampled per family, so can swap with neighboring pair
 		# in list to prevent inbreeding
-		for i in range(nPairs):
-			if sibDict:
-				if sibDict[mRand[i]] == fRand[i]:
-					#print("Full Sib Pair")
-					#print(mRand[i], fRand[i])
-					# if first pair are siblings, swap female with 2nd pair in list
-					if i == 0:
-						#print("first pair")
-						temp = fRand[i+1]
-						fRand[i+1] = fRand[i]
-						fRand[i] = temp
-					# if second pair or later are siblings, swap with i-1 pair in list.
-					else:
-						#print("after first pair")
-						temp = fRand[i-1]
-						fRand[i-1] = fRand[i]
-						fRand[i] = temp
+		try:
+			for i in range(nPairs):
+				if sibDict:
+					if sibDict[mRand[i]] == fRand[i]:
+						#print("Full Sib Pair")
+						#print(mRand[i], fRand[i])
+						# if first pair are siblings, swap female with 2nd pair in list
+						if i == 0:
+							#print("first pair")
+							temp = fRand[i+1]
+							fRand[i+1] = fRand[i]
+							fRand[i] = temp
+						# if second pair or later are siblings, swap with i-1 pair in list.
+						else:
+							#print("after first pair")
+							temp = fRand[i-1]
+							fRand[i-1] = fRand[i]
+							fRand[i] = temp
+		except IndexError as e:
+			print("ERROR:", e)
+			print("This likely occurred because a single spawning pair was generated for a generation.")
+			print("Try increasing the number of starting individuals being simulated (-n / --inds).")
+			print("Exiting program...")
+			print("")
+			raise SystemExit
 
 		# append spawing pairs to default dict once checks for siblings completed.
 		for i in range(nPairs):

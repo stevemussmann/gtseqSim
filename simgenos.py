@@ -45,8 +45,8 @@ class SimGenos():
 
 		return indList
 
-	def simInds(self, inds):
-		indlist = self.makeSampleNames(inds, "prefix")
+	def simInds(self, inds, prefix):
+		indlist = self.makeSampleNames(inds, prefix)
 		data = collections.defaultdict(dict) # key1 = individual; key2 = locus, val = alleles
 
 		# locus = locus name

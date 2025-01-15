@@ -35,7 +35,7 @@ def main():
 
 	# simulate genotypes for first (or only) genepop file
 	sg = SimGenos(freqs) # make new SimGenos object
-	simPdf = sg.simInds(input.args.inds) # simulate genotypes for the requested number of individuals
+	simPdf = sg.simInds(input.args.inds, input.args.prefix1) # simulate genotypes for the requested number of individuals
 
 
 	## handle second (optional) genepop file
@@ -57,7 +57,7 @@ def main():
 
 		# simulate genotypes 
 		sg2 = SimGenos(freqs2) # make new SimGenos object
-		simPdf2 = sg2.simInds(input.args.inds) # simulate requested number of genotypes
+		simPdf2 = sg2.simInds(input.args.inds, input.args.prefix2) # simulate requested number of genotypes
 
 
 	## simulate reproduction

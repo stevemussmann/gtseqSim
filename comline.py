@@ -46,6 +46,16 @@ class ComLine():
 							default=50,
 							help="Specify the number of progeny per parental pair"
 		)
+		optional.add_argument("-t", "--prefix1",
+							dest='prefix1',
+							default="taxon1",
+							help="Specify the prefix to be used for naming individuals simulated from the data in your first genepop file (default = taxon1)."
+		)
+		optional.add_argument("-T", "--prefix2",
+							dest='prefix2',
+							default="taxon2",
+							help="Specify the prefix to be used for naming individuals simulated from the data in your second genepop file (default = taxon2)."
+		)
 		self.args = parser.parse_args()
 
 		'''
