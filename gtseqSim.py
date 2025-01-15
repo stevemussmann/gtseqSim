@@ -66,7 +66,7 @@ def main():
 		repro = Reproduce(simPdf, simPdf2)
 	else:
 		reproDF = simPdf
-		for i in range(3):
+		for i in range(input.args.gens):
 			repro = Reproduce(reproDF)
 			prefix = "F" + str(i+1)
 			reproDF = repro.repro(input.args.progeny, prefix)

@@ -14,6 +14,12 @@ class ComLine():
 							required=True,
 							help="Specify a file in genepop format for input."
 		)
+		optional.add_argument("-f", "--generations",
+							dest='gens',
+							type=int,
+							default=2,
+							help="Specify the number of generations to simulate"
+		)
 		optional.add_argument("-G", "--genepop2",
 							dest='genepop2',
 							help="Specify a second genepop file containing allele frequencies for a second population [optional]."
@@ -29,16 +35,16 @@ class ComLine():
 							default=50,
 							help="Specify the number of individual genotypes to simulate"
 		)
+		optional.add_argument("-o", "--outfile",
+							dest='outfile',
+							default="output.genepop.txt",
+							help="Specify an output file name (default = output.genepop.txt)."
+		)
 		optional.add_argument("-p", "--progeny",
 							dest='progeny',
 							type=int,
 							default=50,
 							help="Specify the number of progeny per parental pair"
-		)
-		optional.add_argument("-o", "--outfile",
-							dest='outfile',
-							default="output.genepop.txt",
-							help="Specify an output file name (default = output.genepop.txt)."
 		)
 		self.args = parser.parse_args()
 
@@ -56,6 +62,23 @@ class ComLine():
 		self.exists( self.args.genepop )
 		if self.args.genepop2:
 			self.exists( self.args.genepop2 )
+
+		# check if integers are positive numbers
+		if self.args.inds < 1:
+			print("ERROR: the number of individuals to simulate (-n / --inds) must be > 0.")
+			print("Exiting Program...")
+			print("")
+			raise SystemExit
+		if self.args.progeny < 1:
+			print("ERROR: the number of progeny to simulate (-p / --progeny) must be > 0.")
+			print("Exiting Program...")
+			print("")
+			raise SystemExit
+		if self.args.gens < 0:
+			print("ERROR: the number of generations to simulate (-f / --generations) cannot be negative.")
+			print("Exiting Program...")
+			print("")
+			raise SystemExit
 
 		# check if genepop and genepop2 are same file and print warning
 		if self.args.genepop2:
