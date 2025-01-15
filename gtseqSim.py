@@ -60,6 +60,9 @@ def main():
 		simPdf2 = sg2.simInds(input.args.inds, input.args.prefix2) # simulate requested number of genotypes
 
 
+	# list of pandas dataframes
+	dfList = list()
+
 	## simulate reproduction
 	# optional cross genotypes within or among populations; simulate defined number of generations
 	if input.args.genepop2:
@@ -70,6 +73,7 @@ def main():
 			repro = Reproduce(reproDF)
 			prefix = "F" + str(i+1)
 			reproDF = repro.repro(input.args.progeny, prefix)
+			dfList.append(reproDF)
 
 	# optional missing data simulation
 	if input.args.miss == True:
@@ -82,8 +86,15 @@ def main():
 			sg2.simMissing(simPdf2)
 		#print(simPdf2)
 
-	# write outputs
+	## write outputs
+	# write simulated f0 genotypes
 	gp.write(simPdf, input.args.outfile) # write simulated genotypes to genepop file
+
+	# write genotypes for all successive generations
+	for i in range(input.args.gens):
+		prefix = "F" + str(i+1)
+		fn = prefix + ".genepop.txt"
+		gp.write(dfList[i], fn)
 
 
 	# close log file for writing
