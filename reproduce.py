@@ -13,7 +13,7 @@ class Reproduce():
 		self.geno1 = simPdf
 		self.geno2 = simPdf2
 
-	def repro(self, nOff, prefix):
+	def repro(self, nOff, prefix, pad):
 		#print(self.geno1)
 		if self.geno2 is not None:
 			print("geno2 found")
@@ -35,7 +35,7 @@ class Reproduce():
 			else:
 				spawnPairs = self.getSpawnPairs(genoMatrix)
 				
-			df = self.spawn(spawnPairs, nOff, prefix, genoMatrix)
+			df = self.spawn(spawnPairs, nOff, prefix, genoMatrix, pad)
 			return df
 			#print(df)
 
@@ -71,7 +71,7 @@ class Reproduce():
 
 		return genoMatrix, sibDict
 
-	def spawn(self, dPairs, nOff, prefix, genoMatrix):
+	def spawn(self, dPairs, nOff, prefix, genoMatrix, pad):
 		parentageFile = prefix + ".parentage.txt"
 		fh = open(parentageFile, 'w')
 		fh.write("male_parent\tfemale_parent\toffspring\n")
@@ -91,10 +91,10 @@ class Reproduce():
 				offspring = self.combDict(mHap, fHap) # combine haplotypes
 				b = numpy.random.binomial(1, 0.5) # binomial to decide sex. 0 = f; 1 = m
 				if b == 0:
-					name = prefix + "_F" + str(female)
+					name = prefix + "_F" + str(female).zfill(pad)
 					female = female+1
 				elif b == 1:
-					name = prefix + "_M" + str(male)
+					name = prefix + "_M" + str(male).zfill(pad)
 					male = male+1
 				
 				# write parentage information to file

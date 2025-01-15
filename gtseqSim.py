@@ -25,6 +25,9 @@ def main():
 	fh.write("## gtseqSim.py was executed with the following command:\n" + str(" ".join(sys.argv)) + "\n\n")
 	input = ComLine(sys.argv[1:])
 
+	# get number padding length for assigning sample names
+	pad = len(str((input.args.inds/2)*(input.args.progeny/2)))
+
 	## handle first (or only) genepop file
 	gp = Genepop(input.args.genepop) # make new Genepop object
 	pdf = gp.parse() # parse genepop file and return pandas dataframe
@@ -35,7 +38,7 @@ def main():
 
 	# simulate genotypes for first (or only) genepop file
 	sg = SimGenos(freqs) # make new SimGenos object
-	simPdf = sg.simInds(input.args.inds, input.args.prefix1) # simulate genotypes for the requested number of individuals
+	simPdf = sg.simInds(input.args.inds, input.args.prefix1, pad) # simulate genotypes for the requested number of individuals
 
 
 	## handle second (optional) genepop file
@@ -57,7 +60,7 @@ def main():
 
 		# simulate genotypes 
 		sg2 = SimGenos(freqs2) # make new SimGenos object
-		simPdf2 = sg2.simInds(input.args.inds, input.args.prefix2) # simulate requested number of genotypes
+		simPdf2 = sg2.simInds(input.args.inds, input.args.prefix2, pad) # simulate requested number of genotypes
 
 
 	# list of pandas dataframes
@@ -72,7 +75,7 @@ def main():
 		for i in range(input.args.gens):
 			repro = Reproduce(reproDF)
 			prefix = "F" + str(i+1)
-			reproDF = repro.repro(input.args.progeny, prefix)
+			reproDF = repro.repro(input.args.progeny, prefix, pad)
 			dfList.append(reproDF)
 
 	# optional missing data simulation

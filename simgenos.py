@@ -27,8 +27,8 @@ class SimGenos():
 				del self.d[locus][item] # remove missing data keys from self.d
 		return missDict
 
-	def makeSampleNames(self, inds, prefix):
-		pad = len(str(inds)) # get number padding length
+	def makeSampleNames(self, inds, prefix, pad):
+		#pad = len(str(inds)) # get number padding length
 		female=0
 		male=0
 		indList = list()
@@ -45,8 +45,8 @@ class SimGenos():
 
 		return indList
 
-	def simInds(self, inds, prefix):
-		indlist = self.makeSampleNames(inds, prefix)
+	def simInds(self, inds, prefix, pad):
+		indlist = self.makeSampleNames(inds, prefix, pad)
 		data = collections.defaultdict(dict) # key1 = individual; key2 = locus, val = alleles
 
 		# locus = locus name
