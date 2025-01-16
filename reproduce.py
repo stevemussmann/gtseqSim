@@ -35,8 +35,8 @@ class Reproduce():
 			else:
 				spawnPairs = self.getSpawnPairs(genoMatrix)
 				
-			df = self.spawn(spawnPairs, nOff, prefix, genoMatrix, pad)
-			return df
+			df, familyDict, parentList = self.spawn(spawnPairs, nOff, prefix, genoMatrix, pad)
+			return df, familyDict, parentList
 			#print(df)
 
 	def subsample(self, genoMatrix, parentage):
@@ -76,12 +76,17 @@ class Reproduce():
 		fh = open(parentageFile, 'w')
 		fh.write("male_parent\tfemale_parent\toffspring\n")
 
-		dictlist = list()
+		dictlist = list() # list of dicts of genotypes that will be converted to pandas dataframe
+		familyDict = defaultdict(list) # dict of lists; key=parent pair; val=list of offspring
+		parentList = list() # holds list of parents from this generation
 		female=0
 		male=0
 
 		#for each spawning pair
 		for key, pair in dPairs.items():
+			parentList.append(pair[0])
+			parentList.append(pair[1])
+
 			#for each offspring per pair
 			print("Simulating", str(nOff), "progeny for sample pair", str(pair))
 			for n in range(nOff):
@@ -103,6 +108,9 @@ class Reproduce():
 
 				offspring["index"]=name
 				dictlist.append(offspring)
+
+				parents=pair[0]+","+pair[1]
+				familyDict[parents].append(name)
 			
 		df = pandas.DataFrame(dictlist) #single conversion to pandas dataframe
 		
@@ -117,7 +125,7 @@ class Reproduce():
 
 		fh.close()
 
-		return df
+		return df, familyDict, parentList
 
 
 	def combDict(self, mHap, fHap):

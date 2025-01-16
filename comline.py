@@ -24,6 +24,12 @@ class ComLine():
 							dest='genepop2',
 							help="Specify a second genepop file containing allele frequencies for a second population [optional]."
 		)
+		#optional.add_argument("-l", "--lambda",
+		#					dest='lam',
+		#					type=float,
+		#					default=None,
+		#					help="Specify lambda value for poisson sampling"
+		#)
 		optional.add_argument("-m", "--miss",
 							dest='miss',
 							action='store_true',
