@@ -52,6 +52,11 @@ class ComLine():
 							default=50,
 							help="Specify the number of progeny per parental pair"
 		)
+		optional.add_argument("-r", "--grandma",
+							dest='grandma',
+							action='store_true',
+							help="Write gRandma output (works for biallelic loci only)."
+		)
 		optional.add_argument("-s", "--sequoia",
 							dest='sequoia',
 							action='store_true',

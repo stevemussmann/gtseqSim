@@ -21,7 +21,7 @@ class MajMin():
 				# ignore missing data values
 				# casting as str() in next line because sometimes Excel encodes as int or string
 				if str(key) != mval:
-					quotient, remainder = divmod(len(str(key)), 2) # accounts for any length o    f allele encoding (e.g., 2-digit or 3-digit alleles)
+					quotient, remainder = divmod(len(str(key)), 2) # accounts for any length of allele encoding (e.g., 2-digit or 3-digit alleles)
 					res_first = str(key[:quotient + remainder])
 					res_second = str(key[quotient + remainder:])
 					alleles = [res_first, res_second]

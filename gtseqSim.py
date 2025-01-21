@@ -3,6 +3,7 @@
 from allelefreqs import Allelefreqs
 from comline import ComLine
 from genepop import Genepop
+from grandma import gRandma
 from reproduce import Reproduce
 from sequoia import Sequoia
 from simgenos import SimGenos
@@ -145,6 +146,16 @@ def main():
 		for line in output:
 			seqfh.write(line)
 			seqfh.write("\n")
+
+	if input.args.grandma:
+		print("Writing gRandma output files...")
+		gma = gRandma(combo, sg.mval)
+		gmaOut = gma.convert()
+
+		gmafh = open("output.grandma.txt", 'w')
+		for line in gmaOut:
+			gmafh.write(line)
+			gmafh.write("\n")
 
 
 	# close log file for writing
