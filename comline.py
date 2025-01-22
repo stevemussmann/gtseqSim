@@ -62,6 +62,12 @@ class ComLine():
 							action='store_true',
 							help="Write sequoia output (works for biallelic loci only)."
 		)
+		optional.add_argument("-S", "--secondary",
+							dest='secondary',
+							type=int,
+							default=None,
+							help="Specify the number of individual genotypes to simulate as part of a secondary population (based on allele frequencies from genepop file input in -g / --genepop option)."
+		)
 		optional.add_argument("-t", "--prefix1",
 							dest='prefix1',
 							default="taxon1",

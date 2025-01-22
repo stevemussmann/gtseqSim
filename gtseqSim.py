@@ -40,7 +40,14 @@ def main():
 
 	# simulate genotypes for first (or only) genepop file
 	sg = SimGenos(freqs) # make new SimGenos object
+	## NEED TO MODIFY SimGenos.simInds() FUNCTION TO CAPTURE AVERAGE MISSING DATA WHEN SECOND GENEPOP FILE IS INPUT
 	simPdf = sg.simInds(input.args.inds, input.args.prefix1, pad) # simulate genotypes for the requested number of individuals
+
+	# simulate genotypes for secondary population
+	if input.args.secondary:
+		sgA = SimGenos(freqs)
+		simPdfA = sgA.simInds(input.args.secondary, "secondary", pad) # simulate genotypes for requested number of individuals in input.args.alt
+		print(simPdfA)
 
 
 	## handle second (optional) genepop file
@@ -84,22 +91,13 @@ def main():
 			famList.append(famDict)
 			parList.append(pList)
 	
-	# optional missing data simulation
-	if input.args.miss == True:
-		sg.simMissing(simPdf)
-	#print(simPdf)
-		
-	if input.args.genepop2:
-		# optional missing data simulation
-		if input.args.miss == True:
-			sg2.simMissing(simPdf2)
-		#print(simPdf2)
-
 	## organize data for output
 	# extract parents from among offspring
 	parDFlist = list()
 
 	parDFlist.append(simPdf)
+	if input.args.secondary:
+		parDFlist.append(simPdfA)
 	if input.args.genepop2:
 		parDFlist.append(simPdf2)
 
@@ -120,6 +118,18 @@ def main():
 	## combine dataframes
 	parDFlist.extend(dfList)
 	combo = pandas.concat(parDFlist)
+
+	# optional missing data simulation
+	if input.args.miss == True:
+		combo = sg.simMissing(combo)
+	#print(simPdf)
+		
+	## THE FOLLOWING BLOCK WILL PROBABLY BE DELETED IN FUTURE REVISION
+	#if input.args.genepop2:
+		# optional missing data simulation
+		#if input.args.miss == True:
+			#sg2.simMissing(simPdf2)
+		#print(simPdf2)
 
 	## write outputs
 	# write simulated f0 genotypes

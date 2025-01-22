@@ -94,3 +94,5 @@ class SimGenos():
 					newgeno = "0" * genoLen # make missing data genotype
 					df.loc[index,locus] = newgeno # insert missing data genotype
 
+		return df
+
