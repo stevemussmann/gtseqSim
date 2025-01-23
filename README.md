@@ -86,10 +86,26 @@ Optional Inputs:
 * **-T / --prefix2**: <String> Specify the prefix to be used for naming individuals simulated from the second genepop file (-G / --genepop2 option) (default prefix = taxon2. **CURRENTLY NOT IMPLEMENTED**
 
 ## Example Commands
-To generate 500 simulated genotypes from the example data and simulate missing data, use the following command:
+One of the simplest use cases is to simulate some genotypes from empirically-derived allele frequency data. To generate 500 simulated genotypes from a data file (snpExample.genepop.txt) use the following command:
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -o snpExample.genepop.txt -m
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 0 -o snpExample.genepop.txt
 ```
+
+If you want to produce offspring of those individuals to test parent/offspring relationships, you could do the following. This should produce 100 offspring from each of approximately 250 families. Sex is randomly assigned to the simulated individuals using a binomial distribution with an expected ~1:1 M:F sex ratio, and all reproduction is 1 male x 1 female. This means that it is possible you will have slightly fewer than 250 families (i.e., the limiting factor is the sex with fewer individuals. If you end up with 249 males and 251 females in your starting population, you will have 249 family groups). 
+```
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 1 -p 100 -o snpExample.genepop.txt
+```
+
+You could simulate two generations if you want to evaluate grandparentage:
+```
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt
+```
+
+If you want to simulate missing data in your output files, you can use the `-m` option to model missing data proportions from empirically-observed missing data for each locus:
+```
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt -m
+```
+
 This will create the output `output.genepop.txt` in the folder from which the command was executed.
 
 ## Outputs
