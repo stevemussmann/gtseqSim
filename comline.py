@@ -90,6 +90,17 @@ class ComLine():
 			raise SystemExit
 		'''
 
+		## DISABLE ALL FUNCTIONS RELATED TO GENEPOP2 FILE UNTIL THEY ARE IMPLEMENTED
+		if self.args.genepop2:
+			print("")
+			print("ERROR:")
+			print("All functions related to the second genepop file option (-G / --genepop2) are currently disabled.")
+			print("These will eventually be implemented to help facilitate simulations related to hybridization.")
+			print("Please rerun the program without the -G / --genepop2 option to continue.")
+			print("Exiting program...")
+			print("")
+			raise SystemExit
+
 		#check if files exist
 		self.exists( self.args.genepop )
 		if self.args.genepop2:

@@ -27,6 +27,7 @@ def main():
 	fh.write("## Log file for run beginning at " + formatted_datetime + "\n\n")
 	fh.write("## gtseqSim.py was executed with the following command:\n" + str(" ".join(sys.argv)) + "\n\n")
 	input = ComLine(sys.argv[1:])
+	fh.close()
 
 	# get number padding length for assigning sample names
 	pad = len(str((input.args.inds/2)*(input.args.progeny/2)))
@@ -109,25 +110,31 @@ def main():
 				dfList[i].drop(parList[i+1], inplace=True) # drop parents from original df
 				parDFlist.append(newDF)# add to parental df list
 
-	# do offspring subsampling (if invoked)
+	# do offspring subsampling (if invoked) to prepare list of individuals for removal
 	offDFlist = list()
 	if input.args.lam:
+		discardList = list() # list of offspring that were not retained by subsample function
 		i = 1 # parent list is offset by +1 from the offspring lists
 		for d in famList:
-			print(input.args.lam)
+			#print(input.args.lam)
 			sub = Subsample(input.args.lam)
 			s = sub.poisson(d)
 			if i < len(parList):
 				l = parList[i]
-				sub.subsample(d, s, l)
+				discard = sub.subsample(d, s, l)
 			else:
-				sub.subsample(d, s)
-			print(s)
+				discard = sub.subsample(d, s)
+			discardList.extend(discard)
+			#print(s)
 			i+=1
+		print(discardList)
 
 	## combine dataframes
 	parDFlist.extend(dfList)
 	combo = pandas.concat(parDFlist)
+
+	## remove individuals from combined dataframe (if offspring subsampling is invoked)
+	combo.drop(discardList, inplace=True) 
 
 	# optional missing data simulation
 	if input.args.miss == True:
@@ -153,11 +160,6 @@ def main():
 	
 	# write sequoia output (only works for datasets with exclusively biallelic loci)
 	if input.args.sequoia:
-		#frames = list()
-		#frames.append(simPdf)
-		#for frame in dfList:
-		#	frames.append(frame)
-		#combo = pandas.concat(frames)
 		print("Writing sequoia output file...")
 		seq = Sequoia(combo, sg.mval) # sg.mval is missing data value returned from SimGenos object
 		output = seq.convert()
@@ -179,7 +181,7 @@ def main():
 
 
 	# close log file for writing
-	fh.close()
+	#fh.close()
 
 main()
 
