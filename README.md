@@ -1,13 +1,25 @@
-# gtseqSim
-Simulate genotype data based on allele frequencies.
+# gtseqSim Introduction
+This program simulates genotype data for known parent/offspring pairs based on allele frequency data, and (optionally) simulates missing data in the output files so that researchers can evaluate its impact on their analyses. This README.md file will be updated regarding program functionality as features are added.
 
-This program is a work in progress. This README.md file will be updated regarding program functionality as features are added.
+The program is a work in progress and will have two primary functions when completed. 
+1. Simulate reproduction of diploid organisms in a captive environment to evaluate the power of codominant genetic marker panels for resolving familial relationships.
+2. Simulate reproduction of interspecific hybrids to evaluate the power of codominant genetic marker panels to accurately identify different hybrid categories.
 
-This program calculates allele frequencies for a single population based upon the observed frequencies in the input genepop file. The `random.multinomial` function from numpy is then used to generate simulated genotypes for a user-defined number of individuals based upon those empirical allele frequencies. 
+If you just want to generate some known parent/offspring individuals using allele frequency data from a single genepop file, the program is fully functional at that level. However, many details pertaining to function 1. have been implemented primarily to address a specific use case in ongoing research. I plan to eventually make it more generalized so it will have a wider variety of applications.
 
-The missing genotype rate is calculated separately for each locus from your input genepop file. If the `-m / --miss` option is invoked, then the program will each locus in which missing data were detected and randomly remove genotypes from these loci using the empirically-derived missing data proportion. This is accomplished using the `random.binomial` function from numpy. 
+Function 2. has not yet been implemented.
 
-Loci are assumed to be independent. The simulated genotypes are then output in genepop format.
+Please cite this github repository if you use this software.
+
+## Overview of capabilities
+
+This program accepts a genepop file as input and calculates allele frequencies for a single population based upon the observed frequencies in that file. The `random.multinomial` function from numpy is then used to generate simulated genotypes for a user-defined number of individuals based upon those empirical allele frequencies. The program will function best with SNPs, but should be able to handle microsatellites in most cases. I have not yet tested the program with microhaplotype data. 
+
+If desired, the user can simulate reproduction within the simulated population to produce one or more generations of offspring. These simulations produce distinct cohorts of offspring (i.e., generation N will be the parents of generation N+1 and the grandparents of generation N+2). All reproductive crosses are 1 male x 1 female (i.e., currently there is no option to produce half-siblings, but that may be implemented in the future). One male and one female offspring from each full-sibling family group in Generation N will become part of the parental pool in generation N+1. The program prevents inbreeding from happening within full-sibling family groups, but does not prevent reproduction among cousins. Currently there are no functions to simulate periodic gene flow into the captive population, but this capability may be added in the future. All parent/offspring relationships are recorded by the program for each generation and output to text files. 
+
+The program also includes options to simulate missing genotype data and uneven offspring sampling per family group. The missing genotype rate is calculated separately for each locus from your input genepop file. If the `-m / --miss` option is invoked, then the program will evaluate each locus in which missing data were detected and randomly remove genotypes from these loci using the empirically-derived missing data proportion from your input genotype file. This is accomplished using the `random.binomial` function from numpy. Sampling of offspring for genetic studies often results in uneven representation of family groups. The program attempts to mimic this using the `-l / --lambda` option. This sets the lambda parameter for a poisson distribution that will determine how many offspring are sampled from each family group. Setting a relatively low value (i.e., ~2.0) should result in uneven representation of family groups in the final genotype file. In this case, few or no offspring will be sampled from many family groups, whereas a relatively large number of individuals will be sampled from a small number of family groups. This will allow the user to evaluate whether unequal family representation in a dataset may impact their ability to use a particular marker set to accurately resolve familial relationships. 
+
+Loci are assumed to be independent. The simulated genotypes are output in up to three output formats (genepop, sequoia, and gRandma). The latter two formats will be SNP-specific. 
 
 ## Dependencies
 - numpy
