@@ -106,6 +106,16 @@ If you want to simulate missing data in your output files, you can use the `-m` 
 gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt -m
 ```
 
+You can subsample the offspring of these families to obtain uneven representation of family groups, which is intended to simulate the uneven family representation that may result from randomly sampling captively-produced individuals. All parents used for reproduction will still be retained in the output:
+```
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt -m -l 2.0
+```
+
+The `-r` and `-s` options can be used to output files in [gRandma](https://github.com/delomast/gRandma) and [sequoia](https://github.com/JiscaH/sequoia) formats, respectively. A special filter is also applied exclusively for the `gRandma` output to identify loci that are sufficiently variable (e.g., at least one individual must be heterozygous for alleles a and b, homozygous for allele a, and homozygous for allele b for a locus to be retained in the final `gRandma` output. This could result in some loci being excluded from this file which are present in others. However, the probability of this filter being triggered is reduced as the number of simulated individuals rises. The conditions used in these examples should yield enough individuals that few, if any, loci will be discarded by this filter.
+```
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt -m -l 2.0 -r -s
+```
+
 This will create the output `output.genepop.txt` in the folder from which the command was executed.
 
 ## Outputs
