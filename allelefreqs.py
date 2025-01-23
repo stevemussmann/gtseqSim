@@ -1,13 +1,20 @@
 import collections
 import pandas
+import sys
+
+from contextlib import redirect_stdout
 
 class Allelefreqs():
 	'Class for calculating allele frequencies'
 
-	def __init__(self, df):
+	def __init__(self, df, log):
 		self.pdf = df
+		self.log = log
 
 	def calcFreqs(self):
+		# open log file
+		lfh = open(self.log, 'a')
+
 		dofd=collections.defaultdict(dict) # dict of dicts; key1 = locus name, key2 = allele, val = allele count
 
 		for (columnName, columnData) in self.pdf.items():
@@ -21,6 +28,11 @@ class Allelefreqs():
 					print(e)
 					print("Check if genotypes are encoded in 2-digit or 3-digit format.")
 					print("")
+					with redirect_stdout(lfh):
+						print("Unexpected error in parsing allele frequencies:")
+						print(e)
+						print("Check if genotypes are encoded in 2-digit or 3-digit format.")
+						print("")
 					raise SystemExit
 
 				try:
@@ -46,6 +58,12 @@ class Allelefreqs():
 					print("Unexpected error:")
 					print(e)
 					print("")
+					with redirect_stdout(lfh):
+						print("Unexpected error:")
+						print(e)
+						print("")
 					raise SystemExit
+
+		lfh.close()
 
 		return dofd

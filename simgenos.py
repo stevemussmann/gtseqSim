@@ -5,9 +5,10 @@ import pandas
 class SimGenos():
 	'Class for simulating individual genotypes from allele frequency data'
 
-	def __init__(self, d):
+	def __init__(self, d, log):
 		self.d = d
 		self.miss, self.mval = self.determineMissing()
+		self.log = log
 
 	def determineMissing(self):
 		miss = ""
@@ -29,7 +30,6 @@ class SimGenos():
 		return missDict, miss
 
 	def makeSampleNames(self, inds, prefix, pad):
-		#pad = len(str(inds)) # get number padding length
 		female=0
 		male=0
 		indList = list()
@@ -49,6 +49,9 @@ class SimGenos():
 	def simInds(self, inds, prefix, pad):
 		indlist = self.makeSampleNames(inds, prefix, pad)
 		data = collections.defaultdict(dict) # key1 = individual; key2 = locus, val = alleles
+		
+		lfh = open(self.log, 'a')
+		lfh.write("Simulating " + str(inds) + " genotypes for population " + prefix + ".\n\n")
 
 		# locus = locus name
 		# key2 = dict; key=allele, val=count
@@ -77,22 +80,29 @@ class SimGenos():
 			df_dict = pandas.DataFrame([d], index=[ind]) # convert individual's genotype from dict to pandas dataframe
 			df = pandas.concat([df, df_dict]) # add to growing dataframe
 
+		lfh.close()
+
 		return df
 
 	def simMissing(self, df):
+		lfh = open(self.log, 'a') # open log file
 		# determine which loci need to have missing data simulated
 		simList = list() # list of loci needing missing data simulation
 		for (key, val) in self.miss.items():
 			if val > 0.0:
 				simList.append(key) # add to list of missing data proportion > 0.0
 
+		lfh.write("Simulating missing data at " + str(len(simList)) + " loci:\n")
+
 		for locus in simList:
+			lfh.write(locus + "\t" + str(self.miss[locus]) + "\n")
 			for index, row in df.loc[:, [locus]].iterrows():
 				s = numpy.random.binomial(1, self.miss[locus])
 				if(s == 1):
 					genoLen = len(str(row[locus])) # get length of encoded genotype
 					newgeno = "0" * genoLen # make missing data genotype
 					df.loc[index,locus] = newgeno # insert missing data genotype
-
+		lfh.write("\n")
+		lfh.close() # close log file
 		return df
 

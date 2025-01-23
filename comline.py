@@ -1,10 +1,13 @@
 import argparse
 import os.path
+import sys
+
+from contextlib import redirect_stdout
 
 class ComLine():
 	'Class for implementing command line options'
 
-	def __init__(self, args):
+	def __init__(self, args, logfile):
 		parser = argparse.ArgumentParser()
 		parser._action_groups.pop()
 		required = parser.add_argument_group('Required arguments')
@@ -80,15 +83,7 @@ class ComLine():
 		)
 		self.args = parser.parse_args()
 
-		'''
-		#check if input file ends with .xlsx
-		if not self.args.infile.endswith(".xlsx"):
-			print("ERROR: Input file " + self.args.infile + " does not end with .xlsx file extension.")
-			print("Is this a valid excel file?")
-			print("Exiting Program...")
-			print("")
-			raise SystemExit
-		'''
+		lfh = open(logfile, 'a')
 
 		## DISABLE ALL FUNCTIONS RELATED TO GENEPOP2 FILE UNTIL THEY ARE IMPLEMENTED
 		if self.args.genepop2:
@@ -99,28 +94,52 @@ class ComLine():
 			print("Please rerun the program without the -G / --genepop2 option to continue.")
 			print("Exiting program...")
 			print("")
+			with redirect_stdout(lfh):
+				print("")
+				print("ERROR:")
+				print("All functions related to the second genepop file option (-G / --genepop2) are currently disabled.")
+				print("These will eventually be implemented to help facilitate simulations related to hybridization.")
+				print("Please rerun the program without the -G / --genepop2 option to continue.")
+				print("Exiting program...")
+				print("")
 			raise SystemExit
 
+		lfh.close()
+
 		#check if files exist
-		self.exists( self.args.genepop )
+		self.exists( self.args.genepop, logfile )
 		if self.args.genepop2:
 			self.exists( self.args.genepop2 )
+
+		lfh = open(logfile, 'a')
 
 		# check if integers are positive numbers
 		if self.args.inds < 1:
 			print("ERROR: the number of individuals to simulate (-n / --inds) must be > 0.")
 			print("Exiting Program...")
 			print("")
+			with redirect_stdout(lfh):
+				print("ERROR: the number of individuals to simulate (-n / --inds) must be > 0.")
+				print("Exiting Program...")
+				print("")
 			raise SystemExit
 		if self.args.progeny < 1:
 			print("ERROR: the number of progeny to simulate (-p / --progeny) must be > 0.")
 			print("Exiting Program...")
 			print("")
+			with redirect_stdout(lfh):
+				print("ERROR: the number of progeny to simulate (-p / --progeny) must be > 0.")
+				print("Exiting Program...")
+				print("")
 			raise SystemExit
 		if self.args.gens < 0:
 			print("ERROR: the number of generations to simulate (-f / --generations) cannot be negative.")
 			print("Exiting Program...")
 			print("")
+			with redirect_stdout(lfh):
+				print("ERROR: the number of generations to simulate (-f / --generations) cannot be negative.")
+				print("Exiting Program...")
+				print("")
 			raise SystemExit
 
 		# check if genepop and genepop2 are same file and print warning
@@ -130,11 +149,20 @@ class ComLine():
 				print("WARNING: both genepop files have the same name. If this was not intentional please check your input.")
 				print("****************************************************************************************************")
 				print("")
+				with redirect_stdout(lfh):
+					print("****************************************************************************************************")
+					print("WARNING: both genepop files have the same name. If this was not intentional please check your input.")
+					print("****************************************************************************************************")
+					print("")
+		lfh.close()
 
-	def exists(self, filename):
+	def exists(self, filename, logfile):
+		lfh = open(logfile, 'a')
 		if( os.path.isfile(filename) != True ):
-			print("")
-			print(filename, "does not exist")
-			print("Exiting program...")
-			print("")
+			with redirect_stdout(lfh):
+				print("")
+				print(filename, "does not exist")
+				print("Exiting program...")
+				print("")
 			raise SystemExit
+		lfh.close()

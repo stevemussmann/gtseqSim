@@ -1,25 +1,28 @@
 from collections import defaultdict
+from contextlib import redirect_stdout
 
 import numpy
 import pandas
 import random
 import re
-#import time
+import sys
 
 class Reproduce():
 	'Class for simulating reproduction within or among 1-2 sample groups'
 
-	def __init__(self, simPdf, simPdf2=None):
+	def __init__(self, simPdf, log, simPdf2=None):
 		self.geno1 = simPdf
 		self.geno2 = simPdf2
+		self.log = log
 
 	def repro(self, nOff, prefix, pad):
-		#print(self.geno1)
+		lfh = open(self.log, 'a')
 		if self.geno2 is not None:
 			print("geno2 found")
-			#print(self.geno2)
+			lfh.close()
 		else:
 			print("Conducting within-population crosses...\n")
+			lfh.write("Conducting within-population crosses...\n\n")
 			gen = int(prefix[1:])
 			if gen > 1:
 				prevgen = "F" + str(gen-1)
@@ -36,8 +39,8 @@ class Reproduce():
 				spawnPairs = self.getSpawnPairs(genoMatrix)
 				
 			df, familyDict, parentList = self.spawn(spawnPairs, nOff, prefix, genoMatrix, pad)
+			lfh.close()
 			return df, familyDict, parentList
-			#print(df)
 
 	def subsample(self, genoMatrix, parentage):
 		with open(parentage, 'r') as f:
@@ -50,8 +53,6 @@ class Reproduce():
 			temp = line.split()
 			key = ",".join([temp[0], temp[1]])
 			famDict[key].append(temp[2])
-
-		#print(famDict)
 
 		# pick one male and one female from each family
 		keepList = list()
@@ -80,6 +81,7 @@ class Reproduce():
 		return genoMatrix, sibDict
 
 	def spawn(self, dPairs, nOff, prefix, genoMatrix, pad):
+		lfh = open(self.log, 'a') # open log file
 		parentageFile = prefix + ".parentage.txt"
 		fh = open(parentageFile, 'w')
 		fh.write("male_parent\tfemale_parent\toffspring\n")
@@ -96,6 +98,8 @@ class Reproduce():
 			parentList.append(pair[1])
 
 			#for each offspring per pair
+			with redirect_stdout(lfh):
+				print("Simulating", str(nOff), "progeny for sample pair", str(pair))
 			print("Simulating", str(nOff), "progeny for sample pair", str(pair))
 			for n in range(nOff):
 				mHap = self.getHaplotype(pair[0], genoMatrix) # sample male parent haplotype
@@ -129,6 +133,11 @@ class Reproduce():
 			print("Try increasing the number of simulated individuals in the first generation (-n / --inds)")
 			print("Exiting program...")
 			print("")
+			with redirect_stdout(lfh):
+				print("ERROR:", e)
+				print("Try increasing the number of simulated individuals in the first generation (-n / --inds)")
+				print("Exiting program...")
+				print("")
 			raise SystemExit
 
 		fh.close()

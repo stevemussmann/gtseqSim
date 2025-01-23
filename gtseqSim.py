@@ -9,6 +9,8 @@ from sequoia import Sequoia
 from simgenos import SimGenos
 from subsample import Subsample
 
+from contextlib import redirect_stdout
+
 import datetime
 import numpy
 import pandas
@@ -26,35 +28,37 @@ def main():
 	# print execution command to log
 	fh.write("## Log file for run beginning at " + formatted_datetime + "\n\n")
 	fh.write("## gtseqSim.py was executed with the following command:\n" + str(" ".join(sys.argv)) + "\n\n")
-	input = ComLine(sys.argv[1:])
 	fh.close()
+
+	# get input command line options
+	input = ComLine(sys.argv[1:], logfile)
 
 	# get number padding length for assigning sample names
 	pad = len(str((input.args.inds/2)*(input.args.progeny/2)))
 
 	## handle first (or only) genepop file
-	gp = Genepop(input.args.genepop) # make new Genepop object
+	gp = Genepop(input.args.genepop, logfile) # make new Genepop object
 	pdf = gp.parse() # parse genepop file and return pandas dataframe
 
 	# calculate allele frequencies for first (or only) genepop file 
-	af = Allelefreqs(pdf) # make new allelefreqs object
+	af = Allelefreqs(pdf, logfile) # make new allelefreqs object
 	freqs = af.calcFreqs() # calculate allele frequencies
 
 	# simulate genotypes for first (or only) genepop file
-	sg = SimGenos(freqs) # make new SimGenos object
+	sg = SimGenos(freqs, logfile) # make new SimGenos object
 	## NEED TO MODIFY SimGenos.simInds() FUNCTION TO CAPTURE AVERAGE MISSING DATA WHEN SECOND GENEPOP FILE IS INPUT
 	simPdf = sg.simInds(input.args.inds, input.args.prefix1, pad) # simulate genotypes for the requested number of individuals
 
 	# simulate genotypes for secondary population
 	if input.args.secondary:
-		sgA = SimGenos(freqs)
+		sgA = SimGenos(freqs, logfile)
 		simPdfA = sgA.simInds(input.args.secondary, "secondary", pad) # simulate genotypes for requested number of individuals in input.args.alt
 		print(simPdfA)
 
 	## handle second (optional) genepop file
 	if input.args.genepop2:
 		# parse second (optional) genepop file
-		gp2 = Genepop(input.args.genepop2) # make new Genepop object
+		gp2 = Genepop(input.args.genepop2, logfile) # make new Genepop object
 		pdf2 = gp2.parse() # parse genepop file and return pandas dataframe
 
 		# check if pdf2 contains same loci as pdf
@@ -81,11 +85,11 @@ def main():
 	## simulate reproduction
 	# optional cross genotypes within or among populations; simulate defined number of generations
 	if input.args.genepop2:
-		repro = Reproduce(simPdf, simPdf2)
+		repro = Reproduce(simPdf, logfile, simPdf2)
 	else:
 		reproDF = simPdf
 		for i in range(input.args.gens):
-			repro = Reproduce(reproDF)
+			repro = Reproduce(reproDF, logfile)
 			prefix = "F" + str(i+1)
 			reproDF, famDict, pList = repro.repro(input.args.progeny, prefix, pad)
 			dfList.append(reproDF)
@@ -116,7 +120,6 @@ def main():
 		discardList = list() # list of offspring that were not retained by subsample function
 		i = 1 # parent list is offset by +1 from the offspring lists
 		for d in famList:
-			#print(input.args.lam)
 			sub = Subsample(input.args.lam)
 			s = sub.poisson(d)
 			if i < len(parList):
@@ -125,7 +128,6 @@ def main():
 			else:
 				discard = sub.subsample(d, s)
 			discardList.extend(discard)
-			#print(s)
 			i+=1
 		print(discardList)
 
@@ -134,12 +136,12 @@ def main():
 	combo = pandas.concat(parDFlist)
 
 	## remove individuals from combined dataframe (if offspring subsampling is invoked)
-	combo.drop(discardList, inplace=True) 
+	if input.args.lam:
+		combo.drop(discardList, inplace=True) 
 
 	# optional missing data simulation
 	if input.args.miss == True:
 		combo = sg.simMissing(combo)
-	#print(simPdf)
 		
 	## THE FOLLOWING BLOCK WILL PROBABLY BE DELETED IN FUTURE REVISION
 	#if input.args.genepop2:
@@ -179,9 +181,6 @@ def main():
 			gmafh.write(line)
 			gmafh.write("\n")
 
-
-	# close log file for writing
-	#fh.close()
 
 main()
 

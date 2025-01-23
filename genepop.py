@@ -7,10 +7,15 @@ import pandas
 class Genepop():
 	'Class for parsing and writing Genepop format files'
 
-	def __init__(self, f):
+	def __init__(self, f, log):
 		self.file = f # input genepop file
+		self.log = log # logfile
 
 	def parse(self):
+		# write to log file
+		lfh = open(self.log, 'a')
+		lfh.write("Begin reading input genepop file " + str(self.file) + ".\n")
+
 		# read file
 		with open(self.file) as fh:
 			contents = fh.readlines()
@@ -39,6 +44,9 @@ class Genepop():
 		#print(df)
 		#print(loci)
 		#print(contents)
+		lfh.write("End reading input genepop file " + str(self.file) + ".\n")
+		lfh.close()
+
 		return df
 
 	def write(self, df, f):
@@ -72,56 +80,3 @@ class Genepop():
 				return
 			yield ele
 
-'''
-	def convert(self):
-		pm = Popmap(self.pops)
-		mapDict = pm.parseMap()
-
-		# open file for writing population map.
-		fh=open("genepop.popmap.txt", 'w')
-
-		lineList = list()
-
-		lineList.append('Title line:""')
-
-		for (columnName, columnData) in self.pdf.items():
-			lineList.append(columnName)
-
-		for (pop, num) in mapDict.items():
-			lineList.append("Pop")
-			for sampleName, row in self.pdf.iterrows():
-				sampleList = list()
-				if self.pops[sampleName] == pop:
-					# write to popmap
-					fh.write(sampleName)
-					fh.write("\t")
-					fh.write(pop)
-					fh.write("\n")
-
-					# append data to sampleList
-					sampleList.append(sampleName)
-					sampleList.append(",")
-					sampleList.append("")
-					for (locus, genotype) in row.items():
-						alleles = self.split(str(genotype))
-						locusList = list()
-
-						if len(alleles) == 1 and alleles[0] == '0':
-							locusList.append(self.nucleotides[alleles[0]])
-							locusList.append(self.nucleotides[alleles[0]])
-						else:
-							for allele in alleles:
-								locusList.append(self.nucleotides[allele])
-						locusStr = ''.join(locusList)
-						sampleList.append(locusStr)
-					sampleStr = ' '.join(sampleList)
-					lineList.append(sampleStr)
-
-		# close genepop popmap file
-		fh.close()
-
-		return lineList
-
-	def split(self, word):
-		return [char for char in word]
-'''
