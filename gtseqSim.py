@@ -53,7 +53,6 @@ def main():
 	if input.args.secondary:
 		sgA = SimGenos(freqs, logfile)
 		simPdfA = sgA.simInds(input.args.secondary, "secondary", pad) # simulate genotypes for requested number of individuals in input.args.alt
-		print(simPdfA)
 
 	## handle second (optional) genepop file
 	if input.args.genepop2:
