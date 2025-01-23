@@ -7,6 +7,7 @@ from grandma import gRandma
 from reproduce import Reproduce
 from sequoia import Sequoia
 from simgenos import SimGenos
+from subsample import Subsample
 
 import datetime
 import numpy
@@ -48,7 +49,6 @@ def main():
 		sgA = SimGenos(freqs)
 		simPdfA = sgA.simInds(input.args.secondary, "secondary", pad) # simulate genotypes for requested number of individuals in input.args.alt
 		print(simPdfA)
-
 
 	## handle second (optional) genepop file
 	if input.args.genepop2:
@@ -109,11 +109,21 @@ def main():
 				dfList[i].drop(parList[i+1], inplace=True) # drop parents from original df
 				parDFlist.append(newDF)# add to parental df list
 
-	# do poisson subsampling
-	#offDFlist = list()
-	#if input.args.lam:
-	#	for l in dfList:
-	#		print(input.args.lam)
+	# do offspring subsampling (if invoked)
+	offDFlist = list()
+	if input.args.lam:
+		i = 1 # parent list is offset by +1 from the offspring lists
+		for d in famList:
+			print(input.args.lam)
+			sub = Subsample(input.args.lam)
+			s = sub.poisson(d)
+			if i < len(parList):
+				l = parList[i]
+				sub.subsample(d, s, l)
+			else:
+				sub.subsample(d, s)
+			print(s)
+			i+=1
 
 	## combine dataframes
 	parDFlist.extend(dfList)
@@ -128,12 +138,12 @@ def main():
 	#if input.args.genepop2:
 		# optional missing data simulation
 		#if input.args.miss == True:
-			#sg2.simMissing(simPdf2)
+			#simPdf2 = sg2.simMissing(simPdf2)
 		#print(simPdf2)
 
 	## write outputs
-	# write simulated f0 genotypes
-	gp.write(combo, input.args.outfile) # write simulated genotypes to genepop file
+	# write genotypes to genepop file
+	gp.write(combo, input.args.outfile)
 
 	# write genotypes for all successive generations
 	#for i in range(input.args.gens):

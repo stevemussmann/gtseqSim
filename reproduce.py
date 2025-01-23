@@ -59,8 +59,16 @@ class Reproduce():
 		for fam, sibs in famDict.items():
 			mList, fList = self.checkMF(sibs) # get lists of male and female individuals
 
-			mRand = random.sample(mList, 1)
-			fRand = random.sample(fList, 1)
+			try:
+				mRand = random.sample(mList, 1)
+				fRand = random.sample(fList, 1)
+			except ValueError as e:
+				print("ERROR in sampling parents in Reproduce.subsample() function:")
+				print(e)
+				print("Try increasing number of offspring per family.")
+				print("Exiting program...")
+				print("")
+				raise SystemExit
 			
 			keepList.append(mRand[0])
 			keepList.append(fRand[0])
