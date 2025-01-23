@@ -46,8 +46,8 @@ class ComLine():
 		)
 		optional.add_argument("-o", "--outfile",
 							dest='outfile',
-							default="output.genepop.txt",
-							help="Specify an output file name (default = output.genepop.txt)."
+							default="output",
+							help="Specify an output file name prefix (default = output)."
 		)
 		optional.add_argument("-p", "--progeny",
 							dest='progeny',

@@ -52,6 +52,7 @@ class Genepop():
 	def write(self, df, f):
 		# df = dataframe to write to file
 		# f = output file
+		f = f + ".genepop.txt"
 		towrite = list()
 		towrite.append("Title line:\"\"")
 		for col in df.columns:

@@ -129,7 +129,6 @@ def main():
 				discard = sub.subsample(d, s)
 			discardList.extend(discard)
 			i+=1
-		print(discardList)
 
 	## combine dataframes
 	parDFlist.extend(dfList)
@@ -152,6 +151,7 @@ def main():
 
 	## write outputs
 	# write genotypes to genepop file
+	print("Writing genepop output file...")
 	gp.write(combo, input.args.outfile)
 
 	# write genotypes for all successive generations
@@ -166,7 +166,8 @@ def main():
 		seq = Sequoia(combo, sg.mval) # sg.mval is missing data value returned from SimGenos object
 		output = seq.convert()
 
-		seqfh = open("output.sequoia.txt", 'w')
+		seqF = input.args.outfile + ".sequoia.txt"
+		seqfh = open(seqF, 'w')
 		for line in output:
 			seqfh.write(line)
 			seqfh.write("\n")
@@ -176,7 +177,8 @@ def main():
 		gma = gRandma(combo, sg.mval)
 		gmaOut = gma.convert()
 
-		gmafh = open("output.grandma.txt", 'w')
+		gmaF = input.args.outfile + ".grandma.txt"
+		gmafh = open(gmaF, 'w')
 		for line in gmaOut:
 			gmafh.write(line)
 			gmafh.write("\n")
