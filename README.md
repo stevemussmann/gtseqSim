@@ -57,31 +57,40 @@ export PATH=/path/to/gtseqSim:$PATH
 ```
 
 ## Development Notes
-- This program is in a very early development stage - use at your own risk.
-- Currently treats all individuals in the input genepop file as belonging to the same population.
-- Genepop input format should be somewhat flexible (i.e., either 2-digit or 3-digit format should be acceptable but not tested).
+- This program is in a perpetual stage of development. Please make a backup copy of any files you use with this program before running it - use at your own risk.
+- Currently treats all individuals in the input genepop file as belonging to the same population. I plan to implement options to allow a second population/species input through a second genepop file, but this option and related functions are currently non-functional.
+- The genepop input format is somewhat flexible (i.e., either 2-digit or 3-digit format should be acceptable but not rigorously tested).
 - Missing alleles must be coded in genepop 2-digit or 3-digit format (i.e., 0000 for 2-digit or 000000 for 3-digit).
-- Genotyping error simulation function not yet implemented.
-- Minimal error checking procedures have been implemented. Most error messages will be minimally helpful to the user.
+- A genotyping error simulation function is planned but not yet implemented.
+- Minimal error checking procedures have been implemented. I add error messages when problems are encountered, but many error messages could still be minimally helpful to the user.
 
 ## Input Requirements
 ### Required
 The minimal input is a text file containing genotypes in genepop format.
 
 Required Inputs:
-* **-g / --genepop:** Specify an input text file in genepop format.
+* **-g / --genepop**: Specify an input text file in genepop format.
 
 Optional Inputs:
-* **-m / --miss:** Boolean. Turn on missing data simulation (default = off).
-* **-n / --inds:** Specify the number of individuals for which you want to generate simulated genotypes (default = 50).
-* **-o / --outfile:** Specify an output file name (default = output.genepop.txt)
+* **-f / --generations**: <Integer> Enter the number of generations that you want to simulate. There is technically no limit, but I recommend keeping this number small (ideally ≤ 3).
+* **-G / --genepop2**: <String> Enter the file name of a second genepop file representing a second population or species **CURRENTLY NOT IMPLEMENTED. PROGRAM WILL EXIT IF THIS OPTION IS USED.**
+* **-l / --lambda**: <Float> Specify the lambda parameter value for poisson sampling of offspring. I usually set this value as the number of offspring per family group sampled per generation. 
+* **-m / --miss**: <Boolean> Turn on missing data simulation (default = off).
+* **-n / --inds**: <Integer> Specify the number of individual genotypes you want to simulate for the starting (F0) population (default = 50).
+* **-o / --outfile**: <String> Specify an output file name prefix (default = output)
+* **-p / --progeny**: <Integer> Specify the number of offspring produced per parental pair (default = 50).
+* **-r / --grandma**: <Boolean> Create an input file formatted for [gRandma](https://github.com/delomast/gRandma) (NOTE: Currently only functions correctly for SNP data).
+* **-s / --sequoia**: <Boolean> Create input files formatted for [sequoia](https://github.com/JiscaH/sequoia) (NOTE: Only works for biallelic data).
+* **-S / --secondary**: <Integer> Specify the number of individual genotypes to simulate as part of a secondary population. This is intended to mimic a 'wild' population that exists separately from your main 'captive' population but has similar allele frequencies to the 'captive' population. None of the secondary population will be used to produce offspring.
+* **-t / --prefix1**: <String> Specify the prefix to be used for naming individuals simulated from the first genepop file (-g / --genepop option) (default prefix = taxon1).
+* **-T / --prefix2**: <String> Specify the prefix to be used for naming individuals simulated from the second genepop file (-G / --genepop2 option) (default prefix = taxon2. **CURRENTLY NOT IMPLEMENTED**
 
 ## Example Commands
 To generate 500 simulated genotypes from the example data and simulate missing data, use the following command:
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -o msatExample.genepop.txt -m
+gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -o snpExample.genepop.txt -m
 ```
-This will create the output `msatExample.genepop.txt` in the folder from which the command was executed.
+This will create the output `output.genepop.txt` in the folder from which the command was executed.
 
 ## Outputs
 Output will be a genepop file of simulated genotypes.
