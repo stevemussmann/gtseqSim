@@ -5,9 +5,9 @@ The program is a work in progress and will have two primary functions when compl
 1. Simulate reproduction of diploid organisms in a captive environment to evaluate the power of codominant genetic marker panels for resolving familial relationships.
 2. Simulate reproduction of interspecific hybrids to evaluate the power of codominant genetic marker panels to accurately identify different hybrid categories.
 
-If you just want to generate some known parent/offspring individuals using allele frequency data from a single genepop file, the program is fully functional at that level. However, many details pertaining to function 1. have been implemented primarily to address a specific use case in ongoing research. I plan to eventually make it more generalized so it will have a wider variety of applications.
+If you just want to generate some known parent/offspring individuals using allele frequency data from a single genepop file, the program is fully functional at that level. However, many details pertaining to function 1 have been implemented primarily to address a specific use case in ongoing research. I plan to eventually make it more generalized so it will have a wider variety of applications.
 
-Function 2. has not yet been implemented.
+Function 2 has not yet been implemented.
 
 Please cite this github repository if you use this software.
 
