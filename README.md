@@ -88,35 +88,92 @@ Optional Inputs:
 ## Example Commands
 One of the simplest use cases is to simulate some genotypes from empirically-derived allele frequency data. To generate 500 simulated genotypes from a data file (snpExample.genepop.txt) use the following command:
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 0 -o snpExample.genepop.txt
+gtseqSim.py -g snpExample.genepop.txt -n 500 -f 0
 ```
 
 If you want to produce offspring of those individuals to test parent/offspring relationships, you could do the following. This should produce 100 offspring from each of approximately 250 families. Sex is randomly assigned to the simulated individuals using a binomial distribution with an expected ~1:1 M:F sex ratio, and all reproduction is 1 male x 1 female. This means that it is possible you will have slightly fewer than 250 families (i.e., the limiting factor is the sex with fewer individuals. If you end up with 249 males and 251 females in your starting population, you will have 249 family groups). 
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 1 -p 100 -o snpExample.genepop.txt
+gtseqSim.py -g snpExample.genepop.txt -n 500 -f 1 -p 100
 ```
 
 You could simulate two generations if you want to evaluate grandparentage:
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt
+gtseqSim.py -g snpExample.genepop.txt -n 500 -f 2 -p 100
 ```
 
 If you want to simulate missing data in your output files, you can use the `-m` option to model missing data proportions from empirically-observed missing data for each locus:
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt -m
+gtseqSim.py -g snpExample.genepop.txt -n 500 -f 2 -p 100 -m
 ```
 
 You can subsample the offspring of these families to obtain uneven representation of family groups, which is intended to simulate the uneven family representation that may result from randomly sampling captively-produced individuals. All parents used for reproduction will still be retained in the output:
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt -m -l 2.0
+gtseqSim.py -g snpExample.genepop.txt -n 500 -f 2 -p 100 -m -l 2.0
 ```
 
 The `-r` and `-s` options can be used to output files in [gRandma](https://github.com/delomast/gRandma) and [sequoia](https://github.com/JiscaH/sequoia) formats, respectively. A special filter is also applied exclusively for the `gRandma` output to identify loci that are sufficiently variable (e.g., at least one individual must be heterozygous for alleles a and b, homozygous for allele a, and homozygous for allele b for a locus to be retained in the final `gRandma` output. This could result in some loci being excluded from this file which are present in others. However, the probability of this filter being triggered is reduced as the number of simulated individuals rises. The conditions used in these examples should yield enough individuals that few, if any, loci will be discarded by this filter.
 ```
-gtseqSim.py -g microsatellite_example.genepop.txt -n 500 -f 2 -p 100 -o snpExample.genepop.txt -m -l 2.0 -r -s
+gtseqSim.py -g snpExample.genepop.txt -n 500 -f 2 -p 100 -m -l 2.0 -r -s
 ```
 
-This will create the output `output.genepop.txt` in the folder from which the command was executed.
-
 ## Outputs
-Output will be a genepop file of simulated genotypes.
+### Outputs produced by every run:
+This program will always output a genepop-formatted file of simulated genotypes regardless of the combination of command line options used. The default name of the file will be `output.genepop.txt`.
+
+Parentage for each generation of offspring will always be written (unless the user requests 0 offspring generations with the option `-f 0`). These files will be named `F{x}.parentage.txt` where `{x}` represents the generation number. For example, `F1.parentage.txt` will list the parentage of the F1 offspring. An example of the output format is provided below:
+```
+male_parent     female_parent   offspring
+taxon1_M0000207 taxon1_F0000131 F1_F0000000
+taxon1_M0000207 taxon1_F0000131 F1_F0000001
+taxon1_M0000207 taxon1_F0000131 F1_F0000002
+taxon1_M0000207 taxon1_F0000131 F1_M0000000
+taxon1_M0000207 taxon1_F0000131 F1_M0000001
+taxon1_M0000207 taxon1_F0000131 F1_F0000003
+taxon1_M0000207 taxon1_F0000131 F1_M0000002
+taxon1_M0000207 taxon1_F0000131 F1_M0000003
+taxon1_M0000207 taxon1_F0000131 F1_M0000004
+```
+
+I have also produced a perl script that will generate a list of grandparents for each individual in the F2 generation, given the `F{x}.parentage.txt` files from two successive generations. For example:
+```
+perl listGrandparents.pl -1 F1.parentage.txt -2 F2.parentage.txt
+```
+
+This will produce a file named `output.grandparents.txt` with the following format. In this file, pGF = paternal grandfather, pGM = paternal grandmother, mGF = maternal grandfather, mGM = maternal grandmother.
+```
+offspring       pGF     pGM     mGF     mGM
+F2_F0000000     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000001     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000002     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000003     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000004     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000005     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000006     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000007     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+F2_F0000008     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+```
+
+### Optional outputs
+* sequoia output
+    * These files will only be produced if you have provided a file of biallelic SNPs. 
+    * The `-s` option produces two files. These are the sequoia-formatted genotype file (default name = `output.sequoia.txt`) and the life history data file (`sequoia.LH.txt`)
+    * These can be read into the R package sequoia using the following R commands:
+```
+library("sequoia")
+# genotypes file
+geno <- as.matrix(read.csv("filename.sequoia", sep="\t", header=FALSE, row.names=1))
+
+# life history file
+lh <- read.csv("sequoia.LH.txt", sep="\t", header=TRUE)
+```
+
+* gRandma output
+    * Currently this file will only be produced properly if the input file was a genepop file with 2-digit allele coding with the following pattern: `'00' = 'missing data', '01' = 'A', '02' = 'C', '03' = 'G', and '04' = 'T'`. It is possible that other inputs might yield a gRandma-formatted file, but it is more likely that they will result in errors.
+    * The default output file name is `output.grandma.txt`
+    * The file can be read into gRandma with the following R commands:
+```
+library("gRandma")
+
+genotypes <- read.csv("output.grandma.txt", sep="\t", header=TRUE, na.strings="")
+```
+
