@@ -159,6 +159,10 @@ class ComLine():
 	def exists(self, filename, logfile):
 		lfh = open(logfile, 'a')
 		if( os.path.isfile(filename) != True ):
+			print("")
+			print(filename, "does not exist")
+			print("Exiting program...")
+			print("")
 			with redirect_stdout(lfh):
 				print("")
 				print(filename, "does not exist")
