@@ -134,7 +134,7 @@ taxon1_M0000207 taxon1_F0000131 F1_M0000003
 taxon1_M0000207 taxon1_F0000131 F1_M0000004
 ```
 
-I have also produced a perl script that will generate a list of grandparents for each individual in the F2 generation, given the `F{x}.parentage.txt` files from two successive generations. For example:
+I have also produced a perl script that will generate a list of grandparents for each individual in the F2 generation, given the `F{x}.parentage.txt` files from two consecutive generations. For example:
 ```
 perl listGrandparents.pl -1 F1.parentage.txt -2 F2.parentage.txt
 ```
