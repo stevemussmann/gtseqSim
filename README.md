@@ -161,14 +161,14 @@ F2_F0000008     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
 ```
 library("sequoia")
 # genotypes file
-geno <- as.matrix(read.csv("filename.sequoia", sep="\t", header=FALSE, row.names=1))
+geno <- as.matrix(read.csv("output.sequoia.txt", sep="\t", header=FALSE, row.names=1))
 
 # life history file
 lh <- read.csv("sequoia.LH.txt", sep="\t", header=TRUE)
 ```
 
 * gRandma output
-    * Currently this file will only be produced properly if the input file was a genepop file with 2-digit allele coding with the following pattern: `'00' = 'missing data', '01' = 'A', '02' = 'C', '03' = 'G', and '04' = 'T'`. It is possible that other inputs might yield a gRandma-formatted file, but it is more likely that they will result in errors.
+    * Currently this file will only be produced properly if the input file was a genepop file with 2-digit allele coding with the following pattern: `'00' = 'missing data', '01' = 'A', '02' = 'C', '03' = 'G', and '04' = 'T'`. Other inputs will likely result in errors.
     * The default output file name is `output.grandma.txt`
     * The file can be read into gRandma with the following R commands:
 ```
