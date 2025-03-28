@@ -185,8 +185,9 @@ lh <- read.csv("sequoia.LH.txt", sep="\t", header=TRUE)
 
 * gRandma output
     * Currently this file will only be produced properly if the input file was a genepop file with 2-digit allele coding with the following pattern: `'00' = 'missing data', '01' = 'A', '02' = 'C', '03' = 'G', and '04' = 'T'`. Other inputs will likely result in errors.
-    * The default output file name is `output.grandma.txt`
-    * The file can be read into gRandma with the following R commands:
+    * The default output file name is `output.grandma.txt`.
+    * If you are using known crosses as input, the default output file name from my perl script is `potentialCrosses.txt`. 
+    * The files can be read into gRandma with the following R commands:
 ```
 library("gRandma")
 
