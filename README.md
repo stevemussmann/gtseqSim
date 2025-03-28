@@ -134,6 +134,22 @@ taxon1_M0000207 taxon1_F0000131 F1_M0000003
 taxon1_M0000207 taxon1_F0000131 F1_M0000004
 ```
 
+I also wrote a perl script that will format the list of crosses used in the grandparent generation for inclusion as potential crosses in the gRandma R package. For example:
+```
+perl getCrossRecords.pl -g F1.parentage.txt
+```
+
+This will produce a file named `potentialCrosses.txt` with the following format. Pop = baseline population name, gp1 = female grandparent, gp2 = male grandparent.
+```
+Pop	gp1	gp2
+taxon1	taxon1_F0000239	taxon1_M0000267
+taxon1	taxon1_F0000243	taxon1_M0000160
+taxon1	taxon1_F0000040	taxon1_M0000228
+taxon1	taxon1_F0000299	taxon1_M0000252
+taxon1	taxon1_F0000061	taxon1_M0000003
+taxon1	taxon1_F0000062	taxon1_M0000092
+```
+
 I have also produced a perl script that will generate a list of grandparents for each individual in the F2 generation, given the `F{x}.parentage.txt` files from two consecutive generations. For example:
 ```
 perl listGrandparents.pl -1 F1.parentage.txt -2 F2.parentage.txt
@@ -174,6 +190,10 @@ lh <- read.csv("sequoia.LH.txt", sep="\t", header=TRUE)
 ```
 library("gRandma")
 
+# genotypes file
 genotypes <- read.csv("output.grandma.txt", sep="\t", header=TRUE, na.strings="")
+
+# potential crosses file
+potentialCrosses <- read.csv("potentialCrosses.txt", sep="\t", header=TRUE)
 ```
 
