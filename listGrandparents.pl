@@ -38,19 +38,19 @@ my $f2header = shift( @f2Lines );
 
 foreach my $line( @f1Lines ){
 	my @temp = split( /\s+/, $line );
-	push( @{$f1parents{$temp[2]}}, $temp[0] );
 	push( @{$f1parents{$temp[2]}}, $temp[1] );
+	push( @{$f1parents{$temp[2]}}, $temp[0] );
 }
 
 foreach my $line( @f2Lines ){
 	my @temp = split( /\s+/, $line );
-	push( @{$f2parents{$temp[2]}}, $temp[0] );
 	push( @{$f2parents{$temp[2]}}, $temp[1] );
+	push( @{$f2parents{$temp[2]}}, $temp[0] );
 }
 
 open( OUT, '>', $out ) or die "Can't open $out: $!\n\n";
 
-print OUT "offspring\tpGF\tpGM\tmGF\tmGM\n";
+print OUT "offspring\tpGM\tpGF\tmGM\tmGF\n";
 foreach my $ind( sort keys %f2parents ){
 	print OUT $ind;
 	foreach my $parent( @{$f2parents{$ind}} ){
