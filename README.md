@@ -157,16 +157,16 @@ perl listGrandparents.pl -1 F1.parentage.txt -2 F2.parentage.txt
 
 This will produce a file named `output.grandparents.txt` with the following format. In this file, pGF = paternal grandfather, pGM = paternal grandmother, mGF = maternal grandfather, mGM = maternal grandmother.
 ```
-offspring       pGF     pGM     mGF     mGM
-F2_F0000000     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000001     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000002     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000003     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000004     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000005     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000006     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000007     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
-F2_F0000008     taxon1_M0000197 taxon1_F0000080 taxon1_M0000050 taxon1_F0000097
+offspring       pGM     pGF     mGM     mGF
+F2_F0000000     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000001     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000002     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000003     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000004     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000005     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000006     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000007     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
+F2_F0000008     taxon1_F0000197 taxon1_M0000080 taxon1_F0000050 taxon1_M0000097
 ```
 
 ### Optional outputs
