@@ -10,7 +10,7 @@ import sys
 def main():
 	input = ComLine(sys.argv[1:])
 
-	gpop = Genepop(input.args.genepop, input.args.json)
+	gpop = Genepop(input.args.genepop, input.args.json, input.args.outfile)
 	gpop.parseGenepop() # parse data from genepop file
 	gpop.convertGenepop() # convert genepop file to microhaplotype format
 

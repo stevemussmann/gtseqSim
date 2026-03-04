@@ -5,10 +5,11 @@ import json
 class Genepop():
 	'Class for operating on Genepop format files'
 
-	def __init__(self, file, ldict):
-		self.file = file
+	def __init__(self, infile, ldict, outfile):
+		self.file = infile
 		self.loci = list()
 		self.genos = list()
+		self.out = outfile
 
 		# read json
 		with open(ldict, 'r') as fh:
@@ -136,8 +137,7 @@ class Genepop():
 			genoLine = ','.join(genoList)
 			lineList.append(genoLine)
 
-		outName = "convertedData.csv"
-		fh = open(outName, 'w')
+		fh = open(self.out, 'w')
 		for line in lineList:
 			fh.write(line)
 			fh.write("\n")

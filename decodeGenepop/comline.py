@@ -23,8 +23,8 @@ class ComLine():
 		)
 		optional.add_argument("-o", "--outfile",
 							dest='outfile',
-							default="default.txt",
-							help="Specify output file name (default=outfile.csv)"
+							default="convertedData.csv",
+							help="Specify output file name (default=convertedData.csv)"
 		)
 		self.args = parser.parse_args()
 
