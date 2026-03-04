@@ -11,20 +11,26 @@ class ComLine():
 		required = parser.add_argument_group('required arguments')
 		optional = parser.add_argument_group('optional arguments')
 
-		required.add_argument("-f", "--infile",
-							dest='infile',
+		required.add_argument("-g", "--genepop",
+							dest='genepop',
 							required=True,
-							help="Specify input file"
+							help="Specify input genepop file."
+		)
+		required.add_argument("-j", "--json",
+							dest='json',
+							required=True,
+							help="Specify json dictionary of genepop allele encodings."
 		)
 		optional.add_argument("-o", "--outfile",
 							dest='outfile',
 							default="default.txt",
-							help="Specify output file name (default=default.txt)"
+							help="Specify output file name (default=outfile.csv)"
 		)
 		self.args = parser.parse_args()
 
 		# check if files exist
-		self.exists( self.args.infile )
+		self.exists( self.args.genepop )
+		self.exists( self.args.json )
 
 	def exists(self, filename):
 		if( os.path.isfile(filename) != True ):
