@@ -64,10 +64,39 @@ class Genepop():
 			itemList = item.split()
 			itemList = [thing for thing in itemList if thing != ',']
 			name = itemList.pop(0)
+
+			# add individual name
 			genoList.append(name)
-			genoList.append(name)
-			genoList.append(name)
-			genoList.append(name)
+
+			# add population ID
+			popID = "Unknown" # initialize unknown as default
+			if name.startswith("simgenotaxon1") == True:
+				popID = "F0"
+			elif name.startswith("simgenosecondary") == True:
+				popID = "Unrelated"
+			elif name.startswith("simgenoF1") == True:
+				popID = "F1"
+			genoList.append(popID)
+
+			# add colony2 value
+			sex = "Unknown"
+			splitName = name.split("_")
+			if splitName[1].startswith("M") == True:
+				sex = "Male"
+			elif splitName[1].startswith("F") == True:
+				sex = "Female"
+
+			# if F0 or Unrelated, count as parents and add sex data to genoList; else they are offspring
+			colony2Val = "offspring"
+			if popID == "F0" or popID == "Unrelated":
+				colony2Val = sex
+			genoList.append(colony2Val)
+
+			# add sex
+			genoList.append(sex)
+
+			
+			counter = 0 # initialize counter to access locus names by index in list
 			for locus in itemList:
 				try:
 					if (len(str(locus)) % 2) == 0:
@@ -75,8 +104,25 @@ class Genepop():
 						gpAllele1 = str(locus[:quotient + remainder])
 						gpAllele2 = str(locus[quotient + remainder:])
 
-						genoList.append(gpAllele1)
-						genoList.append(gpAllele2)
+						# convert allele1
+						try:
+							if gpAllele1 == "000":
+								genoList.append("NA")
+							else:
+								genoList.append(self.ldict[self.loci[counter]][gpAllele1])
+
+							# convert allele2
+							if gpAllele2 == "000":
+								genoList.append("NA")
+							else:
+								genoList.append(self.ldict[self.loci[counter]][gpAllele2])
+						except ValueError as e:
+							print("Key not found in locus dictionary:")
+							print(e)
+							print("Error occurred at this locus:")
+							print(self.loci[counter])
+							print("")
+							raise SystemExit(1)
 
 					else:
 						raise ValueError("Genepop alleles should be encoded as 2-digit or 3-digit format (i.e., 0202 or 102102). Missing data should be 0000 or 000000.")
@@ -85,6 +131,7 @@ class Genepop():
 					print(e)
 					print("")
 					raise SystemExit(1)
+				counter+=1
 
 			genoLine = ','.join(genoList)
 			lineList.append(genoLine)
