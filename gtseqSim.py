@@ -2,6 +2,7 @@
 
 from allelefreqs import Allelefreqs
 from comline import ComLine
+from colony import Colony
 from genepop import Genepop
 from grandma import gRandma
 from reproduce import Reproduce
@@ -34,7 +35,12 @@ def main():
 	input = ComLine(sys.argv[1:], logfile)
 
 	# get number padding length for assigning sample names
-	pad = len(str((input.args.inds/2)*(input.args.progeny/2)))
+	maxInds = 0
+	if input.args.inds2:
+		maxInds = input.args.inds1 + input.args.inds2
+	else:
+		maxInds = input.args.inds1
+	pad = len(str((maxInds/2)*(input.args.meanProgeny/2)))
 
 	## handle first (or only) genepop file
 	gp = Genepop(input.args.genepop, logfile) # make new Genepop object
@@ -47,12 +53,12 @@ def main():
 	# simulate genotypes for first (or only) genepop file
 	sg = SimGenos(freqs, logfile) # make new SimGenos object
 	## NEED TO MODIFY SimGenos.simInds() FUNCTION TO CAPTURE AVERAGE MISSING DATA WHEN SECOND GENEPOP FILE IS INPUT
-	simPdf = sg.simInds(input.args.inds, input.args.prefix1, pad) # simulate genotypes for the requested number of individuals
+	simPdf = sg.simInds(input.args.inds1, input.args.prefix1, pad, input.args.sex1) # simulate genotypes for the requested number of individuals
 
 	# simulate genotypes for secondary population
 	if input.args.secondary:
 		sgA = SimGenos(freqs, logfile)
-		simPdfA = sgA.simInds(input.args.secondary, "secondary", pad) # simulate genotypes for requested number of individuals in input.args.alt
+		simPdfA = sgA.simInds(input.args.secondary, "secondary", pad, 0.5) # simulate genotypes for requested number of individuals in input.args.alt
 
 	## handle second (optional) genepop file
 	if input.args.genepop2:
@@ -68,12 +74,12 @@ def main():
 			raise SystemExit
 	
 		# calculate allele frequencies
-		af2 = Allelefreqs(pdf2) # make new allelefreqs object
+		af2 = Allelefreqs(pdf2, logfile) # make new allelefreqs object
 		freqs2 = af2.calcFreqs() # calculate allele frequencies
 
 		# simulate genotypes 
-		sg2 = SimGenos(freqs2) # make new SimGenos object
-		simPdf2 = sg2.simInds(input.args.inds, input.args.prefix2, pad) # simulate requested number of genotypes
+		sg2 = SimGenos(freqs2, logfile) # make new SimGenos object
+		simPdf2 = sg2.simInds(input.args.inds2, input.args.prefix2, pad, input.args.sex2) # simulate requested number of genotypes
 
 
 	# list of pandas dataframes
@@ -84,13 +90,26 @@ def main():
 	## simulate reproduction
 	# optional cross genotypes within or among populations; simulate defined number of generations
 	if input.args.genepop2:
-		repro = Reproduce(simPdf, logfile, simPdf2)
+		# if you only want to simulate hybrid crosses - option not implemented yet
+		if input.args.hybrid == True:
+			print("Hybrid option not fully implemented.")
+			print("Only a genepop file of simulated parental genotypes will be printed.\n\n")
+			repro = Reproduce(simPdf, logfile, simPdf2)
+		# if you want to merge the two genepop files and do random mating - fixed at one generation currently
+		else:
+			reproDF = pandas.concat([simPdf, simPdf2], ignore_index=False) # combine genotypes simulated from two genepop files for random mating
+			repro = Reproduce(reproDF, logfile)
+			prefix = "F1"
+			reproDF, famDict, pList = repro.repro(input.args.meanProgeny, input.args.sdProgeny, prefix, pad, input.args.polyandry, input.args.polygyny)
+			dfList.append(reproDF)
+			famList.append(famDict)
+			parList.append(pList)
 	else:
 		reproDF = simPdf
 		for i in range(input.args.gens):
 			repro = Reproduce(reproDF, logfile)
 			prefix = "F" + str(i+1)
-			reproDF, famDict, pList = repro.repro(input.args.progeny, prefix, pad)
+			reproDF, famDict, pList = repro.repro(input.args.meanProgeny, input.args.sdProgeny, prefix, pad, input.args.polyandry, input.args.polygyny)
 			dfList.append(reproDF)
 			famList.append(famDict)
 			parList.append(pList)
@@ -171,6 +190,7 @@ def main():
 			seqfh.write(line)
 			seqfh.write("\n")
 
+	# write gRandma output
 	if input.args.grandma:
 		print("Writing gRandma output files...")
 		gma = gRandma(combo, sg.mval)
@@ -181,6 +201,18 @@ def main():
 		for line in gmaOut:
 			gmafh.write(line)
 			gmafh.write("\n")
+	
+	# write COLONY output
+	if input.args.colony:
+		print("Writing COLONY output file...")
+		colony = Colony(combo, input.args.prefix1, input.args.prefix2)
+		colOut = colony.convert()
+
+		colF = "Colony2.Dat"
+		colfh = open(colF, 'w')
+		for line in colOut:
+			colfh.write(line)
+			colfh.write("\n")
 
 
 main()

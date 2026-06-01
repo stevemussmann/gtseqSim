@@ -15,7 +15,7 @@ class Reproduce():
 		self.geno2 = simPdf2
 		self.log = log
 
-	def repro(self, nOff, prefix, pad):
+	def repro(self, meanOff, sdOff, prefix, pad, polya, polyg):
 		lfh = open(self.log, 'a')
 		if self.geno2 is not None:
 			print("geno2 found")
@@ -34,11 +34,11 @@ class Reproduce():
 				genoMatrix = self.geno1
 
 			if gen > 1:	
-				spawnPairs = self.getSpawnPairs(genoMatrix, sibDict)
+				spawnPairs = self.getSpawnPairs(genoMatrix, polya, polyg, sibDict)
 			else:
-				spawnPairs = self.getSpawnPairs(genoMatrix)
+				spawnPairs = self.getSpawnPairs(genoMatrix, polya, polyg)
 				
-			df, familyDict, parentList = self.spawn(spawnPairs, nOff, prefix, genoMatrix, pad)
+			df, familyDict, parentList = self.spawn(spawnPairs, meanOff, sdOff, prefix, genoMatrix, pad)
 			lfh.close()
 			return df, familyDict, parentList
 
@@ -80,11 +80,12 @@ class Reproduce():
 
 		return genoMatrix, sibDict
 
-	def spawn(self, dPairs, nOff, prefix, genoMatrix, pad):
+	def spawn(self, dPairs, meanOff, sdOff, prefix, genoMatrix, pad):
 		lfh = open(self.log, 'a') # open log file
 		parentageFile = prefix + ".parentage.txt"
 		fh = open(parentageFile, 'w')
 		fh.write("male_parent\tfemale_parent\toffspring\n")
+		rng = numpy.random.default_rng() # initialize random number generator
 
 		dictlist = list() # list of dicts of genotypes that will be converted to pandas dataframe
 		familyDict = defaultdict(list) # dict of lists; key=parent pair; val=list of offspring
@@ -98,6 +99,7 @@ class Reproduce():
 			parentList.append(pair[1])
 
 			#for each offspring per pair
+			nOff = int(numpy.round(numpy.maximum(rng.normal(meanOff, sdOff),1))) # draw single integer from normal distribution and force it to be a positive value (if <1)
 			with redirect_stdout(lfh):
 				print("Simulating", str(nOff), "progeny for sample pair", str(pair))
 			print("Simulating", str(nOff), "progeny for sample pair", str(pair))
@@ -185,12 +187,24 @@ class Reproduce():
 		elif b == 1:
 			return a1
 
-	def getSpawnPairs(self, genoMatrix, sibDict=None):
+	def getSpawnPairs(self, genoMatrix, polya, polyg, sibDict=None):
 		index_list = genoMatrix.index.to_list()
 
 		mList, fList = self.checkMF(index_list) # get lists of male and female individuals
 		
 		nPairs = min(len(mList), len(fList)) # get length of shorter list of individuals
+
+		# if polyandry, duplicate male list
+		if polya:
+			print("Polyandry enabled.")
+			print("Each male can spawn 0-2 times.")
+			mList = mList + mList
+
+		# if polygyny, duplicate female list
+		if polyg:
+			print("Polygyny enabled.")
+			print("Each female can spawn 0-2 times.")
+			fList = fList + fList
 
 		# randomly sample lists to get equal length lists for pairing
 		mRand = random.sample(mList, nPairs)

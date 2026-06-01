@@ -29,12 +29,12 @@ class SimGenos():
 				del self.d[locus][item] # remove missing data keys from self.d
 		return missDict, miss
 
-	def makeSampleNames(self, inds, prefix, pad):
+	def makeSampleNames(self, inds, prefix, pad, sexratio):
 		female=0
 		male=0
 		indList = list()
 		for i in range(inds):
-			b = numpy.random.binomial(1, 0.5) # binomial to assign sex. 0 = f; 1 = m
+			b = numpy.random.binomial(1, sexratio) # binomial to assign sex. 0 = f; 1 = m
 			if b == 0:
 				name = prefix + "_F" + str(female).zfill(pad)
 				female = female+1
@@ -46,8 +46,8 @@ class SimGenos():
 
 		return indList
 
-	def simInds(self, inds, prefix, pad):
-		indlist = self.makeSampleNames(inds, prefix, pad)
+	def simInds(self, inds, prefix, pad, sexratio):
+		indlist = self.makeSampleNames(inds, prefix, pad, sexratio)
 		data = collections.defaultdict(dict) # key1 = individual; key2 = locus, val = alleles
 		
 		lfh = open(self.log, 'a')
