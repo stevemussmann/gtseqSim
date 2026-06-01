@@ -7,19 +7,19 @@ The program is a work in progress and will have two primary functions when compl
 
 If you just want to generate some known parent/offspring individuals using allele frequency data from a single genepop file, the program is fully functional at that level. However, many details pertaining to function 1 have been implemented primarily to address a specific use case in ongoing research. I plan to eventually make it more generalized so it will have a wider variety of applications.
 
-Function 2 has not yet been implemented.
+Function 2 is only partially implemented. You can conduct random mating of two populations, but A) these features have not been robustly tested, and B) I haven't implemented functions that will guarantee you will get all hybrid categories output from the program.
 
 Please cite this github repository if you use this software.
 
 ## Overview of capabilities
 
-This program accepts a genepop file as input and calculates allele frequencies for a single population based upon the observed frequencies in that file. The `random.multinomial` function from numpy is then used to generate simulated genotypes for a user-defined number of individuals based upon those empirical allele frequencies. The program will function best with SNPs, but should be able to handle microsatellites in most cases. I have not yet tested the program with microhaplotype data. 
+This program accepts a genepop file as input and calculates allele frequencies for a single population based upon the observed frequencies in that file. The `random.multinomial` function from numpy is then used to generate simulated genotypes for a user-defined number of individuals based upon those empirical allele frequencies. The program will function with any data type that has been converted into a genepop file.
 
-If desired, the user can simulate reproduction within the simulated population to produce one or more generations of offspring. These simulations produce distinct cohorts of offspring (i.e., generation N will be the parents of generation N+1 and the grandparents of generation N+2). All reproductive crosses are 1 male x 1 female (i.e., currently there is no option to produce half-siblings, but that may be implemented in the future). One male and one female offspring from each full-sibling family group in Generation N will become part of the parental pool in generation N+1. The program prevents inbreeding from happening within full-sibling family groups, but does not prevent reproduction among cousins. Currently there are no functions to simulate periodic gene flow into the captive population, but this capability may be added in the future. All parent/offspring relationships are recorded by the program for each generation and output to text files. 
+If desired, the user can simulate reproduction within the simulated population to produce one or more generations of offspring. These simulations produce distinct cohorts of offspring (i.e., generation N will be the parents of generation N+1 and the grandparents of generation N+2). All reproductive crosses are 1 male x 1 female, unless the polyandry and/or polygyny options are invoked. In these cases, individuals may spawn with 0-2 partners. One male and one female offspring from each full-sibling family group in Generation N will become part of the parental pool in generation N+1. The program prevents inbreeding from happening within full-sibling family groups, but does not prevent reproduction among cousins. Currently there are no functions to simulate periodic gene flow into the captive population, but this capability may be added in the future. All parent/offspring relationships are recorded by the program for each generation and output to text files. 
 
 The program also includes options to simulate missing genotype data and uneven offspring sampling per family group. The missing genotype rate is calculated separately for each locus from your input genepop file. If the `-m / --miss` option is invoked, then the program will evaluate each locus in which missing data were detected and randomly remove genotypes from these loci using the empirically-derived missing data proportion from your input genotype file. This is accomplished using the `random.binomial` function from numpy. Sampling of offspring for genetic studies often results in uneven representation of family groups. The program attempts to mimic this using the `-l / --lambda` option. This sets the lambda parameter for a poisson distribution that will determine how many offspring are sampled from each family group. Setting a relatively low value (i.e., ~2.0) should result in uneven representation of family groups in the final genotype file. In this case, few or no offspring will be sampled from many family groups, whereas a relatively large number of individuals will be sampled from a small number of family groups. This will allow the user to evaluate whether unequal family representation in a dataset may impact their ability to use a particular marker set to accurately resolve familial relationships. 
 
-Loci are assumed to be independent. The simulated genotypes are output in up to three output formats (genepop, sequoia, and gRandma). The latter two formats will be SNP-specific. 
+Loci are assumed to be independent. The simulated genotypes are output in up to four output formats (colony, genepop, gRandma, and sequoia). Sequoia is a SNP-specific output format
 
 ## Dependencies
 - numpy
@@ -58,7 +58,7 @@ export PATH=/path/to/gtseqSim:$PATH
 
 ## Development Notes
 - This program is in a perpetual stage of development. Please make a backup copy of any files you use with this program before running it - use at your own risk.
-- Currently treats all individuals in the input genepop file as belonging to the same population. I plan to implement options to allow a second population/species input through a second genepop file, but this option and related functions are currently non-functional.
+- Currently treats all individuals in an input genepop file as belonging to the same population. A second population/species can be input through a second genepop file, but this option currently has some restricted functionality.
 - The genepop input format is somewhat flexible (i.e., either 2-digit or 3-digit format should be acceptable but not rigorously tested).
 - Missing alleles must be coded in genepop 2-digit or 3-digit format (i.e., 0000 for 2-digit or 000000 for 3-digit).
 - A genotyping error simulation function is planned but not yet implemented.
@@ -72,18 +72,26 @@ Required Inputs:
 * **-g / --genepop**: Specify an input text file in genepop format.
 
 Optional Inputs:
-* **-f / --generations**: <Integer> Enter the number of generations that you want to simulate. There is technically no limit, but I recommend keeping this number small (ideally ≤ 3).
-* **-G / --genepop2**: <String> Enter the file name of a second genepop file representing a second population or species **CURRENTLY NOT IMPLEMENTED. PROGRAM WILL EXIT IF THIS OPTION IS USED.**
+* **-c / --colony**: <Boolean> Create an input file formatted for [COLONY](https://www.zsl.org/about-zsl/resources/software/colony) (Note: Currently only outputs simulated offspring to the COLONY format). 
+* **-f / --generations**: <Integer> Enter the number of generations that you want to simulate. I recommend keeping this number small (ideally ≤ 3). Values >2 are ignored when inputting data from two genepop files.
+* **-H / --hybrid**: <Boolean> Used to turn on interspecific hybrid simulation (option not yet implemented).
+* **-G / --genepop2**: <String> Enter the file name of a second genepop file representing a second population or species **LIMITED FUNCTIONALITY.**
 * **-l / --lambda**: <Float> Specify the lambda parameter value for poisson sampling of offspring. I usually set this value as the number of offspring per family group sampled per generation. 
 * **-m / --miss**: <Boolean> Turn on missing data simulation (default = off).
-* **-n / --inds**: <Integer> Specify the number of individual genotypes you want to simulate for the starting (F0) population (default = 50).
+* **-n / --inds1**: <Integer> Specify the number of individual genotypes you want to simulate for the starting (F0) population from the -g/--genepop file (default = 50).
+* **-N / --inds2**: <Integer> Specify the number of individual genotypes you want to simulate for the starting (F0) population from the -G/--genepop2 file (default = 50).
 * **-o / --outfile**: <String> Specify an output file name prefix (default = output)
-* **-p / --progeny**: <Integer> Specify the number of offspring produced per parental pair (default = 50).
+* **-p / --meanProgeny**: <Integer> Specify the mean number of offspring produced per parental pair (default = 50).
+* **-P / --sdProgeny**: <Integer> Specify the standard deviation of offspring produced per parental pair (default = 0).
 * **-r / --grandma**: <Boolean> Create an input file formatted for [gRandma](https://github.com/delomast/gRandma) (NOTE: Currently only functions correctly for SNP data).
 * **-s / --sequoia**: <Boolean> Create input files formatted for [sequoia](https://github.com/JiscaH/sequoia) (NOTE: Only works for biallelic data).
 * **-S / --secondary**: <Integer> Specify the number of individual genotypes to simulate as part of a secondary population. This is intended to mimic a 'wild' population that exists separately from your main 'captive' population but has similar allele frequencies to the 'captive' population. None of the secondary population will be used to produce offspring.
 * **-t / --prefix1**: <String> Specify the prefix to be used for naming individuals simulated from the first genepop file (-g / --genepop option) (default prefix = taxon1).
-* **-T / --prefix2**: <String> Specify the prefix to be used for naming individuals simulated from the second genepop file (-G / --genepop2 option) (default prefix = taxon2. **CURRENTLY NOT IMPLEMENTED**
+* **-T / --prefix2**: <String> Specify the prefix to be used for naming individuals simulated from the second genepop file (-G / --genepop2 option) (default prefix = taxon2.
+* **-x / --sex1**: <Float> Specify the expected sex ratio for genotypes simulated from -g/--genepop input file (default = 0.5, increasing value increases male proportion. 0.0 <= x <= 1.0).
+* **-X / --sex2**: <Float> Specify the expected sex ratio for genotypes simulated from -G/--genepop2 input file (default = 0.5, increasing value increases male proportion. 0.0 <= x <= 1.0).
+* **-y / --polyandry**: <Boolean> Enable polyandry (each male is added to the spawn candidate list twice).
+* **-Y / --polygyny**: <Boolean> Enable polygyny (each female is added to the spawn candidate list twice).
 
 ## Example Commands
 One of the simplest use cases is to simulate some genotypes from empirically-derived allele frequency data. To generate 500 simulated genotypes from a data file (snpExample.genepop.txt) use the following command:
@@ -114,6 +122,11 @@ gtseqSim.py -g snpExample.genepop.txt -n 500 -f 2 -p 100 -m -l 2.0
 The `-r` and `-s` options can be used to output files in [gRandma](https://github.com/delomast/gRandma) and [sequoia](https://github.com/JiscaH/sequoia) formats, respectively. A special filter is also applied exclusively for the `gRandma` output to identify loci that are sufficiently variable (e.g., at least one individual must be heterozygous for alleles a and b, homozygous for allele a, and homozygous for allele b for a locus to be retained in the final `gRandma` output. This could result in some loci being excluded from this file which are present in others. However, the probability of this filter being triggered is reduced as the number of simulated individuals rises. The conditions used in these examples should yield enough individuals that few, if any, loci will be discarded by this filter.
 ```
 gtseqSim.py -g snpExample.genepop.txt -n 500 -f 2 -p 100 -m -l 2.0 -r -s
+```
+
+A more complicated example using two inputs. In this case, all individuals in the first input file (myy.gen) are YY-males. The `-x` option forces all individuals in the F0 generation simulated from these genotypes to be male. Individuals in the second input file (tyee.gen) can be male or female, with slightly greater probability of being female than male (`-X 0.495`). Unequal numbers of individuals are simulated from each genotype file (`-n 346`, `-N 2708`). Both polyandry (`-y`) and polygyny (`-Y`) options are turned on. Offspring will be unevenly sampled per family group (`-l 2.0`), and a COLONY-formatted file will be output (`-c`).
+```
+gtseqSim.py -g myy.gen -G tyee.gen -t "Myy" -T "Tyee" -x 1.0 -X 0.495 -n 346 -N 2708 -p 708 -P 284 -f 1 -m -y -c -Y -l 2.0
 ```
 
 ## Outputs
@@ -198,3 +211,6 @@ genotypes <- read.csv("output.grandma.txt", sep="\t", header=TRUE, na.strings=""
 potentialCrosses <- read.csv("potentialCrosses.txt", sep="\t", header=TRUE)
 ```
 
+* COLONY output
+    * Currently limited - will only include offspring; not parental (F0) generations.
+    * Will add more options to customize output eventually.
