@@ -64,7 +64,7 @@ class Genepop():
 			tempname.append("simgeno")
 			tempname.append(str(index))
 			templist.append("".join(tempname))
-			string = " ".join(row.values.flatten().tolist())
+			string = " ".join(row.values.to_numpy().flatten().tolist())
 			templist.append(string)
 			finalstring = " ,  ".join(templist)
 			towrite.append(finalstring)
